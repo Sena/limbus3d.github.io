@@ -1,0 +1,12 @@
+{
+  "sp": { "name": "São Paulo", "value": 0.92 },
+  "rj": { "name": "Rio de Janeiro", "value": 0.98 },
+  "mg": { "name": "Minas Gerais", "value": 0.85 },
+  "pr": { "name": "Paraná", "value": 0.82 },
+  "sc": { "name": "Santa Catarina", "value": 0.75 },
+  "rs": { "name": "Rio Grande do Sul", "value": 0.88 },
+  "ba": { "name": "Bahia", "value": 1.05 },
+  "pe": { "name": "Pernambuco", "value": 0.95 },
+  "pa": { "name": "Pará", "value": 1.10 },
+  "df": { "name": "Distrito Federal", "value": 0.90 }
+}
