@@ -4,29 +4,65 @@
     { "model": "A1", "watts": 0.065 },
     { "model": "P1P", "watts": 0.070 },
     { "model": "P1S", "watts": 0.075 },
-    { "model": "X1 Carbon", "watts": 0.085 }
+    { "model": "X1 Carbon", "watts": 0.085 },
+    { "model": "X1E", "watts": 0.095 },
+    { "model": "H2S / H2D", "watts": 0.120 }
   ],
   "Creality": [
-    { "model": "Ender 3 / V2", "watts": 0.060 },
-    { "model": "Ender 3 S1", "watts": 0.070 },
+    { "model": "Ender 3 / V2 / Neo", "watts": 0.060 },
+    { "model": "Ender 3 S1 / Pro", "watts": 0.070 },
+    { "model": "Ender 3 V3 SE", "watts": 0.075 },
+    { "model": "Ender 3 V3 KE", "watts": 0.090 },
     { "model": "Ender 5 S1", "watts": 0.080 },
-    { "model": "K1", "watts": 0.100 },
-    { "model": "K1 Max", "watts": 0.120 },
-    { "model": "Ender 3 V3 KE", "watts": 0.090 }
+    { "model": "K1 / K1C", "watts": 0.100 },
+    { "model": "K1 Max", "watts": 0.130 },
+    { "model": "K2 Plus", "watts": 0.160 },
+    { "model": "CR-10 Smart Pro", "watts": 0.110 },
+    { "model": "CR-M4 (Grande Formato)", "watts": 0.180 }
+  ],
+  "Prusa Research": [
+    { "model": "MK3S+", "watts": 0.080 },
+    { "model": "MK4 / MK4S", "watts": 0.085 },
+    { "model": "Mini+", "watts": 0.055 },
+    { "model": "XL (1 Cabeça)", "watts": 0.150 },
+    { "model": "XL (5 Cabeças)", "watts": 0.220 },
+    { "model": "CORE One", "watts": 0.115 }
+  ],
+  "Elegoo": [
+    { "model": "Neptune 3 Pro", "watts": 0.075 },
+    { "model": "Neptune 4 / Pro", "watts": 0.110 },
+    { "model": "Neptune 4 Plus", "watts": 0.140 },
+    { "model": "Neptune 4 Max", "watts": 0.170 },
+    { "model": "Centauri Carbon", "watts": 0.125 }
   ],
   "Anycubic": [
     { "model": "Kobra 2 Neo", "watts": 0.065 },
     { "model": "Kobra 2 Pro", "watts": 0.080 },
-    { "model": "Kobra 2 Max", "watts": 0.100 }
+    { "model": "Kobra 2 Plus", "watts": 0.110 },
+    { "model": "Kobra 2 Max", "watts": 0.145 },
+    { "model": "Kobra 3 Combo", "watts": 0.105 }
   ],
-  "Artillery": [
-    { "model": "Sidewinder X2", "watts": 0.075 },
-    { "model": "Genius Pro", "watts": 0.060 }
+  "Qidi Tech": [
+    { "model": "X-Smart 3", "watts": 0.085 },
+    { "model": "X-Plus 3", "watts": 0.120 },
+    { "model": "X-Max 3", "watts": 0.190 },
+    { "model": "Q1 Pro", "watts": 0.110 }
   ],
-  "Outras Marcas": [
-    { "model": "Prusa MK3S+ / MK4", "watts": 0.080 },
-    { "model": "Kingroon KP3S Pro", "watts": 0.070 },
-    { "model": "Elegoo Neptune 4 Pro", "watts": 0.110 },
-    { "model": "Elegoo Neptune 4 Max", "watts": 0.130 }
+  "AnkerMake": [
+    { "model": "M5", "watts": 0.110 },
+    { "model": "M5C", "watts": 0.090 }
+  ],
+  "Sovol": [
+    { "model": "SV06 / SV07", "watts": 0.085 },
+    { "model": "SV08", "watts": 0.150 }
+  ],
+  "Flashforge": [
+    { "model": "Adventurer 5M / Pro", "watts": 0.095 },
+    { "model": "Guider 3 Ultra", "watts": 0.160 }
+  ],
+  "Flsun": [
+    { "model": "V400 (Delta)", "watts": 0.130 },
+    { "model": "S1 (Delta High Speed)", "watts": 0.250 },
+    { "model": "T1", "watts": 0.180 }
   ]
 }
