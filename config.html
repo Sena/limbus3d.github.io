@@ -7,7 +7,7 @@
   <style>
     :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 1rem; }
-    .container { background: var(--card); padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 600px; }
+    .container { background: var(--card); padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); width: 100%; max-width: 600px; }
     h1 { font-size: 1.4rem; text-align: center; color: var(--primary); margin-bottom: 1.5rem; }
     .input-group { margin-bottom: 1rem; }
     label { display: block; font-size: 0.85rem; font-weight: 600; color: #64748b; margin-bottom: 0.3rem; }
@@ -27,7 +27,9 @@
       <div class="row">
         <div class="input-group">
           <label>Estado (Tarifa Média)</label>
-          <select id="selEst"><option>Carregando...</option></select>
+          <select id="selEst">
+            <option value="outros">Inserir Manualmente</option>
+          </select>
         </div>
         <div class="input-group">
           <label>Custo kWh (R$)</label>
@@ -37,7 +39,9 @@
 
       <div class="input-group">
         <label>Modelo da Impressora</label>
-        <select id="selImp"><option>Carregando...</option></select>
+        <select id="selImp">
+          <option value="outros">Personalizado (Manual)</option>
+        </select>
       </div>
 
       <div class="row">
@@ -53,7 +57,7 @@
 
       <div class="alert-box">
         <p class="info">
-          <strong>Nota sobre o consumo:</strong> Os valores de potência (kW) por modelo são estimativas médias baseadas em operação estável. Para uma precisão rigorosa...
+          <strong>Nota sobre o consumo:</strong> Os valores de potência (kW) por modelo são estimativas médias. Para precisão, consulte o manual ou use um medidor de tomada.
         </p>
       </div>
 
@@ -70,7 +74,6 @@
       <button type="button" class="btn" onclick="copy()">Copiar Link do Simulador</button>
     </form>
   </div>
-
   <script src="app-config.js"></script>
 </body>
 </html>
