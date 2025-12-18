@@ -3,75 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Configuração de Custos 3D</title>
+  <title>Painel de Configuração Mestra</title>
   <style>
-    :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; }
+    :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --orange: #f97316; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 1rem; }
-    .container { background: var(--card); padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); width: 100%; max-width: 600px; }
+    .container { background: var(--card); padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); width: 100%; max-width: 600px; }
     h1 { font-size: 1.4rem; text-align: center; color: var(--primary); margin-bottom: 1.5rem; }
-    .input-group { margin-bottom: 1rem; }
+    .input-group { margin-bottom: 1.2rem; }
     label { display: block; font-size: 0.85rem; font-weight: 600; color: #64748b; margin-bottom: 0.3rem; }
-    input, select { width: 100%; padding: 0.7rem; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; background: #fff; }
+    input, select { width: 100%; padding: 0.7rem; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    #linkOutput { margin-top: 1rem; padding: 1rem; background: #f1f5f9; border-radius: 8px; font-size: 0.75rem; word-break: break-all; border: 1px solid #e2e8f0; color: #475569; font-family: monospace; }
-    .btn { width: 100%; padding: 0.9rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 1rem; transition: background 0.2s; }
-    .btn:hover { background: #1d4ed8; }
-    .alert-box { background: #fff7ed; border-left: 4px solid #f97316; padding: 0.8rem; margin-top: 0.5rem; border-radius: 4px; }
-    .info { font-size: 0.75rem; color: #9a3412; line-height: 1.4; }
+    .field-alert { font-size: 0.72rem; color: #94a3b8; line-height: 1.3; margin-top: 0.4rem; padding-left: 4px; border-left: 2px solid #e2e8f0; }
+    .field-alert strong { color: var(--orange); }
+    .link-section { margin-top: 1.5rem; background: #f1f5f9; padding: 1.2rem; border-radius: 12px; border: 1px solid #e2e8f0; }
+    #linkOutput { width: 100%; background: transparent; border: none; font-family: monospace; font-size: 0.75rem; color: #475569; margin-bottom: 1rem; resize: none; outline: none; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .btn { padding: 0.9rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+    .btn-copy { background: #e2e8f0; color: #475569; }
+    .btn-go { background: var(--primary); color: white; }
+    hr { border:0; border-top:1px solid #f1f5f9; margin: 1.5rem 0; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Configuração Mestra de Custos</h1>
+    <h1>Configuração Mestra</h1>
     <form id="configForm">
       <div class="row">
         <div class="input-group">
           <label>Estado (Tarifa Média)</label>
-          <select id="selEst">
-            <option value="outros">Inserir Manualmente</option>
-          </select>
+          <select id="selEst"><option value="outros">Inserir Manualmente</option></select>
         </div>
         <div class="input-group">
           <label>Custo kWh (R$)</label>
           <input type="number" id="energyKwh" value="0.92" step="0.01">
         </div>
       </div>
-
+      <div class="field-alert"><strong>Aviso:</strong> Para exatidão total, consulte sua fatura de energia.</div>
+      <hr>
       <div class="input-group">
         <label>Modelo da Impressora</label>
-        <select id="selImp">
-          <option value="outros">Personalizado (Manual)</option>
-        </select>
+        <select id="selImp"><option value="outros">Personalizado (Manual)</option></select>
       </div>
-
       <div class="row">
         <div class="input-group">
           <label>Consumo Estimado (kW)</label>
           <input type="number" id="consumoKw" value="0.07" step="0.001">
         </div>
         <div class="input-group">
-          <label>Margem de Lucro (Ex: 2.0)</label>
+          <label>Margem de Lucro</label>
           <input type="number" id="margin" value="2.0" step="0.1">
         </div>
       </div>
-
-      <div class="alert-box">
-        <p class="info">
-          <strong>Nota sobre o consumo:</strong> Os valores de potência (kW) por modelo são estimativas médias. Para precisão, consulte o manual ou use um medidor de tomada.
-        </p>
-      </div>
-
-      <hr style="border:0; border-top:1px solid #e2e8f0; margin:1.5rem 0;">
-
+      <div class="field-alert"><strong>Aviso:</strong> O consumo varia conforme a temperatura de operação.</div>
+      <hr>
       <div class="row">
         <div class="input-group"><label>Preço Rolo (R$)</label><input type="number" id="pRolo" value="100"></div>
         <div class="input-group"><label>Peso Rolo (g)</label><input type="number" id="wRolo" value="1000"></div>
       </div>
-
       <div class="input-group"><label>Custo Fixo de Setup (R$)</label><input type="number" id="machineCost" value="10"></div>
-
-      <div id="linkOutput">Gerando link configurado...</div>
-      <button type="button" class="btn" onclick="copy()">Copiar Link do Simulador</button>
+      <div class="link-section">
+        <label>Link Gerado:</label>
+        <textarea id="linkOutput" readonly rows="2">Gerando...</textarea>
+        <div class="actions">
+          <button type="button" class="btn btn-copy" onclick="ConfigApp.copy()">📋 Copiar</button>
+          <a id="btnGo" href="#" class="btn btn-go" target="_blank">🚀 Abrir</a>
+        </div>
+      </div>
     </form>
   </div>
   <script src="app-config.js"></script>
