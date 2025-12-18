@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Configuração Mestra</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Configuração Mestra</h1>
+        <form id="configForm">
+            <div class="row">
+                <div class="input-group">
+                    <label>Estado (Tarifa)</label>
+                    <select id="selEst">
+                        <option value="0.92">São Paulo (R$ 0,92)</option>
+                        <option value="0.98">Rio de Janeiro (R$ 0,98)</option>
+                        <option value="1.05">Bahia (R$ 1,05)</option>
+                        <option value="outros">Manual</option>
+                    </select>
+                </div>
+                <div class="input-group"><label>kWh (R$)</label><input type="number" id="energyKwh" value="0.92" step="0.01"></div>
+            </div>
+            <div class="field-alert"><strong>Dica:</strong> Valores médios. Use o campo manual para exatidão total.</div>
+
+            <hr>
+
+            <div class="input-group">
+                <label>Modelo da Impressora</label>
+                <select id="selImp">
+                    <option value="0.045">Bambu Lab A1 Mini (45W)</option>
+                    <option value="0.065">Bambu Lab A1 (65W)</option>
+                    <option value="0.085">Bambu Lab X1 Carbon (85W)</option>
+                    <option value="0.060">Creality Ender 3 (60W)</option>
+                    <option value="outros">Manual</option>
+                </select>
+            </div>
+            <div class="row">
+                <div class="input-group"><label>Consumo (kW)</label><input type="number" id="consumoKw" value="0.07" step="0.001"></div>
+                <div class="input-group"><label>Margem (Lucro)</label><input type="number" id="margin" value="2.0" step="0.1"></div>
+            </div>
+            <div class="field-alert"><strong>Dica:</strong> O consumo real depende das temperaturas de mesa e bico.</div>
+
+            <hr>
+
+            <div class="row">
+                <div class="input-group"><label>Preço Rolo (R$)</label><input type="number" id="priceFilament" value="100"></div>
+                <div class="input-group"><label>Peso Rolo (g)</label><input type="number" id="weightFilament" value="1000"></div>
+            </div>
+            <div class="input-group"><label>Setup Fixo (R$)</label><input type="number" id="machineCost" value="10"></div>
+
+            <div class="link-section" style="margin-top:2rem; background:#f1f5f9; padding:1.2rem; border-radius:12px;">
+                <label>Link Gerado:</label>
+                <textarea id="linkOutput" readonly style="resize:none; font-family:monospace; font-size:0.75rem; border:none; background:transparent; margin-bottom:1rem;"></textarea>
+                <div class="actions">
+                    <button type="button" class="btn btn-secondary" onclick="ConfigManager.copy()">📋 Copiar</button>
+                    <a id="btnGo" href="#" class="btn btn-primary" target="_blank">🚀 Abrir</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const ConfigManager = {
+            init() {
+                const form = document.getElementById('configForm');
+                form.addEventListener('input', (e) => this.handleInput(e));
+                this.generate();
+            },
+
+            handleInput(e) {
+                if(e.target.id === 'selEst' && e.target.value !== 'outros') document.getElementById('energyKwh').value = e.target.value;
+                if(e.target.id === 'selImp' && e.target.value !== 'outros') document.getElementById('consumoKw').value = e.target.value;
+                this.generate();
+            },
+
+            generate() {
+                const priceFil = parseFloat(document.getElementById('priceFilament').value) || 0;
+                const weightFil = parseFloat(document.getElementById('weightFilament').value) || 1000;
+                
+                const data = {
+                    priceKg: ((priceFil / weightFil) * 1000).toFixed(2),
+                    energyKwh: document.getElementById('energyKwh').value,
+                    machineCost: document.getElementById('machineCost').value,
+                    margin: document.getElementById('margin').value,
+                    consumoKw: document.getElementById('consumoKw').value
+                };
+
+                const url = window.location.href.replace('config.html', 'simulador.html') + '?data=' + AppEngine.encodeData(data);
+                document.getElementById('linkOutput').value = url;
+                document.getElementById('btnGo').href = url;
+            },
+
+            copy() {
+                const output = document.getElementById('linkOutput');
+                output.select();
+                document.execCommand('copy');
+                alert("Link copiado com sucesso!");
+            }
+        };
+
+        window.onload = () => ConfigManager.init();
+    </script>
+</body>
+</html>
