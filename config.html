@@ -12,12 +12,19 @@
             <div class="row">
                 <div class="input-group">
                     <label>Estado (Tarifa)</label>
-                    <select id="selEst">
+                      <select id="selEst">
                         <option value="0.92">São Paulo (R$ 0,92)</option>
                         <option value="0.98">Rio de Janeiro (R$ 0,98)</option>
+                        <option value="0.85">Minas Gerais (R$ 0,85)</option>
+                        <option value="0.82">Paraná (R$ 0,82)</option>
+                        <option value="0.75">Santa Catarina (R$ 0,75)</option>
+                        <option value="0.88">Rio Grande do Sul (R$ 0,88)</option>
                         <option value="1.05">Bahia (R$ 1,05)</option>
-                        <option value="outros">Manual</option>
-                    </select>
+                        <option value="0.95">Pernambuco (R$ 0,95)</option>
+                        <option value="1.10">Pará (R$ 1,10)</option>
+                        <option value="0.90">Distrito Federal (R$ 0,90)</option>
+                        <option value="outros">Inserir Manualmente</option>
+                      </select>
                 </div>
                 <div class="input-group"><label>kWh (R$)</label><input type="number" id="energyKwh" value="0.92" step="0.01"></div>
             </div>
@@ -28,11 +35,37 @@
             <div class="input-group">
                 <label>Modelo da Impressora</label>
                 <select id="selImp">
-                    <option value="0.045">Bambu Lab A1 Mini (45W)</option>
-                    <option value="0.065">Bambu Lab A1 (65W)</option>
-                    <option value="0.085">Bambu Lab X1 Carbon (85W)</option>
-                    <option value="0.060">Creality Ender 3 (60W)</option>
-                    <option value="outros">Manual</option>
+                  <optgroup label="Bambu Lab">
+                    <option value="0.045">Bambu Lab - A1 Mini (45W)</option>
+                    <option value="0.065">Bambu Lab - A1 (65W)</option>
+                    <option value="0.070">Bambu Lab - P1P (70W)</option>
+                    <option value="0.075">Bambu Lab - P1S (75W)</option>
+                    <option value="0.085">Bambu Lab - X1 Carbon (85W)</option>
+                  </optgroup>
+                  <optgroup label="Creality">
+                    <option value="0.060">Creality - Ender 3 / V2 (60W)</option>
+                    <option value="0.070">Creality - Ender 3 S1 (70W)</option>
+                    <option value="0.080">Creality - Ender 5 S1 (80W)</option>
+                    <option value="0.100">Creality - K1 (100W)</option>
+                    <option value="0.120">Creality - K1 Max (120W)</option>
+                    <option value="0.090">Creality - Ender 3 V3 KE (90W)</option>
+                  </optgroup>
+                  <optgroup label="Anycubic">
+                    <option value="0.065">Anycubic - Kobra 2 Neo (65W)</option>
+                    <option value="0.080">Anycubic - Kobra 2 Pro (80W)</option>
+                    <option value="0.100">Anycubic - Kobra 2 Max (100W)</option>
+                  </optgroup>
+                  <optgroup label="Artillery">
+                    <option value="0.075">Artillery - Sidewinder X2 (75W)</option>
+                    <option value="0.060">Artillery - Genius Pro (60W)</option>
+                  </optgroup>
+                  <optgroup label="Outras Marcas">
+                    <option value="0.080">Prusa - MK3S+ / MK4 (80W)</option>
+                    <option value="0.070">Kingroon - KP3S Pro (70W)</option>
+                    <option value="0.110">Elegoo - Neptune 4 Pro (110W)</option>
+                    <option value="0.130">Elegoo - Neptune 4 Max (130W)</option>
+                  </optgroup>
+                    <option value="outros">Personalizado (Manual)</option>
                 </select>
             </div>
             <div class="row">
@@ -87,7 +120,7 @@
                     consumoKw: document.getElementById('consumoKw').value
                 };
 
-                const url = window.location.href.replace('config.html', 'simulador.html') + '?data=' + AppEngine.encodeData(data);
+                const url = window.location.href.replace('config.html', 'index.html') + '?data=' + AppEngine.encodeData(data);
                 document.getElementById('linkOutput').value = url;
                 document.getElementById('btnGo').href = url;
             },
