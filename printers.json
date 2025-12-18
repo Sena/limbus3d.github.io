@@ -1,0 +1,32 @@
+{
+  "Bambu Lab": [
+    { "model": "A1 Mini", "watts": 0.045 },
+    { "model": "A1", "watts": 0.065 },
+    { "model": "P1P", "watts": 0.070 },
+    { "model": "P1S", "watts": 0.075 },
+    { "model": "X1 Carbon", "watts": 0.085 }
+  ],
+  "Creality": [
+    { "model": "Ender 3 / V2", "watts": 0.060 },
+    { "model": "Ender 3 S1", "watts": 0.070 },
+    { "model": "Ender 5 S1", "watts": 0.080 },
+    { "model": "K1", "watts": 0.100 },
+    { "model": "K1 Max", "watts": 0.120 },
+    { "model": "Ender 3 V3 KE", "watts": 0.090 }
+  ],
+  "Anycubic": [
+    { "model": "Kobra 2 Neo", "watts": 0.065 },
+    { "model": "Kobra 2 Pro", "watts": 0.080 },
+    { "model": "Kobra 2 Max", "watts": 0.100 }
+  ],
+  "Artillery": [
+    { "model": "Sidewinder X2", "watts": 0.075 },
+    { "model": "Genius Pro", "watts": 0.060 }
+  ],
+  "Outras Marcas": [
+    { "model": "Prusa MK3S+ / MK4", "watts": 0.080 },
+    { "model": "Kingroon KP3S Pro", "watts": 0.070 },
+    { "model": "Elegoo Neptune 4 Pro", "watts": 0.110 },
+    { "model": "Elegoo Neptune 4 Max", "watts": 0.130 }
+  ]
+}
