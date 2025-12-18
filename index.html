@@ -1,11 +1,117 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculadora de Custos de Impressão 3D</title>
+    <meta charset="UTF-8">
+    <title>Calculadora de Impressão</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>WIP</h1>
+    <div class="container">
+        <h1>Simulador de Orçamento</h1>
+        <form id="simulatorForm">
+            <div class="input-group">
+                <label for="quantity">Quantidade de Peças</label>
+                <input type="number" id="quantity" value="1" min="1">
+            </div>
+            <div class="row">
+                <div class="input-group">
+                    <label id="labelWeight" for="weight">Peso</label>
+                    <input type="text" id="weight" placeholder="Ex: 50g ou 1kg" autofocus>
+                </div>
+                <div class="input-group">
+                    <label id="labelTime" for="minutes">Tempo</label>
+                    <input type="text" id="minutes" placeholder="Ex: 30m ou 2h" value="0">
+                </div>
+            </div>
+
+            <div class="hidden">
+                <input type="number" id="priceKg" value="100">
+                <input type="number" id="energyKwh" value="0.90">
+                <input type="number" id="machineCost" value="10">
+                <input type="number" id="margin" value="2.0">
+                <input type="number" id="consumoKw" value="0.07">
+            </div>
+
+            <div class="result-card">
+                <div id="instruction" class="instruction-msg">
+                    <strong>Como preencher:</strong>
+                    <ul>
+                        <li><strong>Peso:</strong> Use números ou unidades (Ex: <code>50g</code>, <code>1kg</code>).</li>
+                        <li><strong>Tempo:</strong> Use minutos ou horas (Ex: <code>45m</code>, <code>2h</code>).</li>
+                    </ul>
+                </div>
+                <div id="resultBox" class="hidden">
+                    <div class="result-label">Preço Total Estimado</div>
+                    <div id="finalPrice" style="font-size: 2.5rem; font-weight: 800; color: var(--success);">R$ 0,00</div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const Simulator = {
+            init() {
+                this.loadExternalData();
+                this.bindEvents();
+                this.update();
+            },
+
+            loadExternalData() {
+                const params = new URLSearchParams(window.location.search);
+                const rawData = params.get('data');
+                if (rawData) {
+                    const data = AppEngine.decodeData(rawData);
+                    if (data) {
+                        Object.keys(data).forEach(key => {
+                            const input = document.getElementById(key);
+                            if (input) input.value = data[key];
+                        });
+                    }
+                }
+            },
+
+            bindEvents() {
+                const form = document.getElementById('simulatorForm');
+                form.addEventListener('input', () => this.update());
+                document.getElementById('quantity').addEventListener('change', () => this.update());
+            },
+
+            update() {
+                const weightInput = document.getElementById('weight');
+                const qtyInput = document.getElementById('quantity');
+                
+                // Enforce minimum quantity
+                if (qtyInput.value !== "" && parseFloat(qtyInput.value) < 1) qtyInput.value = 1;
+
+                const grams = AppEngine.parseInput(weightInput.value, 'weight');
+                const minutes = AppEngine.parseInput(document.getElementById('minutes').value, 'time');
+                const qty = parseFloat(qtyInput.value) || 1;
+
+                if (!weightInput.value.trim() || grams === null || grams === 0) {
+                    document.getElementById('instruction').classList.remove('hidden');
+                    document.getElementById('resultBox').classList.add('hidden');
+                    return;
+                }
+
+                document.getElementById('instruction').classList.add('hidden');
+                document.getElementById('resultBox').classList.remove('hidden');
+
+                const price = AppEngine.calculatePrice({
+                    totalGrams: grams * qty,
+                    totalMinutes: minutes * qty,
+                    priceKg: parseFloat(document.getElementById('priceKg').value),
+                    energyPriceKwh: parseFloat(document.getElementById('energyKwh').value),
+                    fixedCost: parseFloat(document.getElementById('machineCost').value),
+                    margin: parseFloat(document.getElementById('margin').value),
+                    machineKw: parseFloat(document.getElementById('consumoKw').value)
+                });
+
+                document.getElementById('finalPrice').innerText = `R$ ${price.replace('.', ',')}`;
+            }
+        };
+
+        window.onload = () => Simulator.init();
+    </script>
 </body>
 </html>
