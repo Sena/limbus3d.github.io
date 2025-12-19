@@ -1,24 +1,40 @@
 {
   "Bambu Lab": [
     { "model": "A1 Mini", "watts": 0.045 },
+    { "model": "A1 Mini (com AMS Lite)", "watts": 0.055 },
     { "model": "A1", "watts": 0.065 },
+    { "model": "A1 (com AMS Lite)", "watts": 0.075 },
     { "model": "P1P", "watts": 0.070 },
+    { "model": "P1P (com AMS)", "watts": 0.080 },
     { "model": "P1S", "watts": 0.075 },
-    { "model": "X1 Carbon", "watts": 0.085 },
+    { "model": "P1S (com AMS)", "watts": 0.085 },
+    { "model": "P1S Pro", "watts": 0.085 },
+    { "model": "P1S Pro (com AMS)", "watts": 0.095 },
+    { "model": "X1 / X1 Carbon", "watts": 0.085 },
+    { "model": "X1 Carbon (com AMS)", "watts": 0.095 },
     { "model": "X1E", "watts": 0.095 },
-    { "model": "H2S / H2D", "watts": 0.120 }
+    { "model": "X1E (com AMS)", "watts": 0.105 },
+    { "model": "H1 Pro", "watts": 0.110 },
+    { "model": "H1 Pro (com AMS)", "watts": 0.120 },
+    { "model": "H2S / H2D", "watts": 0.120 },
+    { "model": "H2S / H2D (com AMS)", "watts": 0.130 }
   ],
   "Creality": [
     { "model": "Ender 3 / V2 / Neo", "watts": 0.060 },
     { "model": "Ender 3 S1 / Pro", "watts": 0.070 },
     { "model": "Ender 3 V3 SE", "watts": 0.075 },
     { "model": "Ender 3 V3 KE", "watts": 0.090 },
+    { "model": "Ender 3 V3 (CoreXZ)", "watts": 0.110 },
     { "model": "Ender 5 S1", "watts": 0.080 },
+    { "model": "CR-10 SE", "watts": 0.095 },
+    { "model": "CR-10 Smart Pro", "watts": 0.110 },
+    { "model": "CR-M4 (Grande Formato)", "watts": 0.180 },
     { "model": "K1 / K1C", "watts": 0.100 },
     { "model": "K1 Max", "watts": 0.130 },
     { "model": "K2 Plus", "watts": 0.160 },
-    { "model": "CR-10 Smart Pro", "watts": 0.110 },
-    { "model": "CR-M4 (Grande Formato)", "watts": 0.180 }
+    { "model": "K1 / K1C + CFS (Multicolor)", "watts": 0.120 },
+    { "model": "K2 Plus + CFS (Combo)", "watts": 0.180 },
+    { "model": "K2 Plus + 4x CFS (16 Cores)", "watts": 0.240 }
   ],
   "Prusa Research": [
     { "model": "MK3S+", "watts": 0.080 },
