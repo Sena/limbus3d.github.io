@@ -2,116 +2,92 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Calculadora de Impressão</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Impressão 3D</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Simulador de Orçamento</h1>
-        <form id="simulatorForm">
-            <div class="input-group">
-                <label for="quantity">Quantidade de Peças</label>
-                <input type="number" id="quantity" value="1" min="1">
-            </div>
-            <div class="row">
-                <div class="input-group">
-                    <label id="labelWeight" for="weight">Peso</label>
-                    <input type="text" id="weight" placeholder="Ex: 50g ou 1kg" autofocus>
+    <div class="main-wrapper">
+        <aside id="configPanel" class="config-panel hidden">
+            <h2>Configuração Mestra</h2>
+            <form id="configForm">
+                <div class="row">
+                    <div class="input-group">
+                        <label>Estado (Tarifa)</label>
+                        <select id="selEst"><option value="outros">Manual</option></select>
+                    </div>
+                    <div class="input-group">
+                        <label>kWh (R$)</label>
+                        <input type="number" id="energyKwh" value="0.92" step="0.01">
+                    </div>
                 </div>
                 <div class="input-group">
-                    <label id="labelTime" for="minutes">Tempo</label>
-                    <input type="text" id="minutes" placeholder="Ex: 30m ou 2h" value="0">
+                    <label>Impressora</label>
+                    <select id="selImp"><option value="outros">Personalizado</option></select>
                 </div>
-            </div>
+                <div class="row">
+                    <div class="input-group">
+                        <label>Consumo (kW)</label>
+                        <input type="number" id="consumoKw" value="0.07" step="0.001">
+                    </div>
+                    <div class="input-group">
+                        <label>Margem</label>
+                        <input type="number" id="margin" value="2.0" step="0.1">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-group"><label>Preço Rolo</label><input type="number" id="pRolo" value="100"></div>
+                    <div class="input-group"><label>Peso Rolo (g)</label><input type="number" id="wRolo" value="1000"></div>
+                </div>
+                <div class="input-group"><label>Setup (R$)</label><input type="number" id="machineCost" value="10"></div>
+                
+                <div class="link-section">
+                    <label>Link com estes parâmetros:</label>
+                    <textarea id="linkOutput" readonly rows="2"></textarea>
+                    <button type="button" class="btn btn-secondary" onclick="App.copyLink()" style="width:100%">📋 Copiar Link</button>
+                </div>
+            </form>
+        </aside>
 
-            <div class="hidden">
-                <input type="number" id="priceKg" value="100">
-                <input type="number" id="energyKwh" value="0.90">
-                <input type="number" id="machineCost" value="10">
-                <input type="number" id="margin" value="2.0">
-                <input type="number" id="consumoKw" value="0.07">
-            </div>
+        <main class="container">
+            <h1>Simulador de preços</h1>
+            <form id="simulatorForm">
+                <div class="input-group">
+                    <label for="quantity">Quantidade de Peças</label>
+                    <input type="number" id="quantity" value="1" min="1">
+                </div>
+                <div class="row">
+                    <div class="input-group">
+                        <label for="weight">Peso</label>
+                        <input type="text" id="weight" placeholder="Ex: 50g ou 1kg" autofocus>
+                    </div>
+                    <div class="input-group">
+                        <label for="minutes">Tempo</label>
+                        <input type="text" id="minutes" placeholder="Ex: 30m ou 2h" value="0">
+                    </div>
+                </div>
 
-            <div class="result-card">
-                <div id="instruction" class="instruction-msg">
-                    <strong>Como preencher:</strong>
-                    <ul>
-                        <li><strong>Peso:</strong> Use números ou unidades (Ex: <code>50g</code>, <code>1kg</code>).</li>
-                        <li><strong>Tempo:</strong> Use minutos ou horas (Ex: <code>45m</code>, <code>2h</code>).</li>
-                    </ul>
+                <input type="hidden" id="priceKg" value="100">
+
+                <div class="result-card">
+                    <div id="instruction" class="instruction-msg">
+                        <strong>Como preencher:</strong>
+                        <ul>
+                            <li><strong>Peso:</strong> Use números ou unidades (Ex: <code>50g</code>, <code>1kg</code>).</li>
+                            <li><strong>Tempo:</strong> Use minutos ou horas (Ex: <code>45m</code>, <code>2h</code>).</li>
+                        </ul>
+                    </div>
+                    <div id="resultBox" class="hidden">
+                        <div class="result-label">Preço Total Estimado</div>
+                        <div id="finalPrice" style="font-size: 2.5rem; font-weight: 800; color: var(--success);">R$ 0,00</div>
+                    </div>
                 </div>
-                <div id="resultBox" class="hidden">
-                    <div class="result-label">Preço Total Estimado</div>
-                    <div id="finalPrice" style="font-size: 2.5rem; font-weight: 800; color: var(--success);">R$ 0,00</div>
-                </div>
-            </div>
-        </form>
+            </form>
+        </main>
     </div>
 
+    <button id="toggleConfig" class="btn-config-trigger" title="Configurações">⚙️</button>
+
     <script src="app.js"></script>
-    <script>
-        const Simulator = {
-            init() {
-                this.loadExternalData();
-                this.bindEvents();
-                this.update();
-            },
-
-            loadExternalData() {
-                const params = new URLSearchParams(window.location.search);
-                const rawData = params.get('data');
-                if (rawData) {
-                    const data = AppEngine.decodeData(rawData);
-                    if (data) {
-                        Object.keys(data).forEach(key => {
-                            const input = document.getElementById(key);
-                            if (input) input.value = data[key];
-                        });
-                    }
-                }
-            },
-
-            bindEvents() {
-                const form = document.getElementById('simulatorForm');
-                form.addEventListener('input', () => this.update());
-                document.getElementById('quantity').addEventListener('change', () => this.update());
-            },
-
-            update() {
-                const weightInput = document.getElementById('weight');
-                const qtyInput = document.getElementById('quantity');
-                
-                // Enforce minimum quantity
-                if (qtyInput.value !== "" && parseFloat(qtyInput.value) < 1) qtyInput.value = 1;
-
-                const grams = AppEngine.parseInput(weightInput.value, 'weight');
-                const minutes = AppEngine.parseInput(document.getElementById('minutes').value, 'time');
-                const qty = parseFloat(qtyInput.value) || 1;
-
-                if (!weightInput.value.trim() || grams === null || grams === 0) {
-                    document.getElementById('instruction').classList.remove('hidden');
-                    document.getElementById('resultBox').classList.add('hidden');
-                    return;
-                }
-
-                document.getElementById('instruction').classList.add('hidden');
-                document.getElementById('resultBox').classList.remove('hidden');
-
-                const price = AppEngine.calculatePrice({
-                    totalGrams: grams * qty,
-                    totalMinutes: minutes * qty,
-                    priceKg: parseFloat(document.getElementById('priceKg').value),
-                    energyPriceKwh: parseFloat(document.getElementById('energyKwh').value),
-                    fixedCost: parseFloat(document.getElementById('machineCost').value),
-                    margin: parseFloat(document.getElementById('margin').value),
-                    machineKw: parseFloat(document.getElementById('consumoKw').value)
-                });
-
-                document.getElementById('finalPrice').innerText = `R$ ${price.replace('.', ',')}`;
-            }
-        };
-
-        window.onload = () => Simulator.init();
-    </script>
 </body>
 </html>
