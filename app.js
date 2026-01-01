@@ -2,16 +2,15 @@ const App = {
     energyData: {},
     printerData: {},
     storageKey: 'calc3d_settings',
+    panelStateKey: 'calc3d_panel_open',
 
     async init() {
         this.bindEvents();
         await this.loadData();
         
-        // 1. Carrega do Storage primeiro
         this.loadFromStorage();
-        // 2. Sobrescreve com a URL se houver dados novos
         this.parseUrlParams();
-        
+        this.restorePanelState();        
         this.checkConfigState();
         this.calculate();
     },
@@ -41,8 +40,12 @@ const App = {
 
     bindEvents() {
         document.getElementById('toggleConfig').onclick = () => {
-            document.getElementById('configPanel').classList.toggle('hidden');
-            // Remove a animação de atenção ao abrir pela primeira vez
+            const panel = document.getElementById('configPanel');
+            panel.classList.toggle('hidden');
+            
+            const isOpen = !panel.classList.contains('hidden');
+            localStorage.setItem(this.panelStateKey, isOpen);
+
             document.getElementById('toggleConfig').classList.remove('attention-mode');
         };
 
@@ -57,6 +60,13 @@ const App = {
             this.generateLink();
             this.calculate();
         };
+    },
+
+    restorePanelState() {
+        const isOpen = localStorage.getItem(this.panelStateKey) === 'true';
+        if (isOpen) {
+            document.getElementById('configPanel').classList.remove('hidden');
+        }
     },
 
     updatePriceKg() {
@@ -87,7 +97,7 @@ const App = {
             try {
                 const data = JSON.parse(atob(raw));
                 this.fillFields(data);
-                this.saveToStorage(); // Salva os dados vindos da URL
+                this.saveToStorage(); 
             } catch (e) { console.error("Erro decode URL"); }
         }
     },
@@ -101,7 +111,6 @@ const App = {
     },
 
     checkConfigState() {
-        // Se não houver nada no storage, ativa animação de "atenção"
         if (!localStorage.getItem(this.storageKey)) {
             document.getElementById('toggleConfig').classList.add('attention-mode');
         }
