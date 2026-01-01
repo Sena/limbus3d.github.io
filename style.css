@@ -187,3 +187,55 @@ input:focus {
     transform: rotate(90deg);
     opacity: 1;
 }
+
+/* Container do label */
+label[data-tooltip] {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    cursor: default;
+}
+
+/* O ícone (i) */
+label[data-tooltip]::after {
+    content: "ⓘ";
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: var(--bg);
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: help;
+}
+
+/* O Balão de texto */
+label[data-tooltip]::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    width: 180px;
+    opacity: 0;
+    visibility: hidden; /* Garante que não apareça sem hover */
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 999;
+    text-align: center;
+    font-weight: normal;
+    line-height: 1.2;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+label[data-tooltip]:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
