@@ -13,36 +13,45 @@
             <form id="configForm">
                 <div class="row">
                     <div class="input-group">
-                        <label>Estado (Tarifa)</label>
+                        <label for="selEst" data-tooltip="Selecione o estado para carregar a tarifa média de energia automaticamente.">Estado (Tarifa)</label>
                         <select id="selEst"><option value="outros">Manual</option></select>
                     </div>
                     <div class="input-group">
-                        <label>kWh (R$)</label>
+                        <label for="energyKwh" data-tooltip="Custo total por kWh, incluindo impostos (ICMS, PIS/COFINS).">kWh (R$)</label>
                         <input type="number" id="energyKwh" value="0.92" step="0.01">
                     </div>
                 </div>
                 <div class="input-group">
-                    <label>Impressora</label>
+                    <label for="selImp" data-tooltip="Modelo da impressora para ajuste de consumo base.">Impressora</label>
                     <select id="selImp"><option value="outros">Personalizado</option></select>
                 </div>
                 <div class="row">
                     <div class="input-group">
-                        <label>Consumo (kW)</label>
+                        <label for="consumoKw" data-tooltip="Consumo elétrico médio da impressora durante o funcionamento.">Consumo (kW)</label>
                         <input type="number" id="consumoKw" value="0.07" step="0.001">
                     </div>
                     <div class="input-group">
-                        <label>Margem</label>
+                        <label for="margin" data-tooltip="Fator de lucro e custos fixos (2.0 = 100% de margem).">Margem</label>
                         <input type="number" id="margin" value="2.0" step="0.1">
                     </div>
                 </div>
                 <div class="row">
-                    <div class="input-group"><label>Preço Rolo</label><input type="number" id="pRolo" value="100"></div>
-                    <div class="input-group"><label>Peso Rolo (g)</label><input type="number" id="wRolo" value="1000"></div>
+                    <div class="input-group">
+                        <label for="pRolo" data-tooltip="Preço pago pelo carretel de filamento.">Preço Rolo</label>
+                        <input type="number" id="pRolo" value="100">
+                    </div>
+                    <div class="input-group">
+                        <label for="wRolo" data-tooltip="Peso líquido do material no rolo (padrão 1000g).">Peso Rolo (g)</label>
+                        <input type="number" id="wRolo" value="1000">
+                    </div>
                 </div>
-                <div class="input-group"><label>Setup (R$)</label><input type="number" id="machineCost" value="10"></div>
+                <div class="input-group">
+                    <label for="machineCost" data-tooltip="Custo fixo por início de impressão (tempo de fatiamento, limpeza, etc).">Setup (R$)</label>
+                    <input type="number" id="machineCost" value="10">
+                </div>
                 
                 <div class="link-section">
-                    <label>Link com estes parâmetros:</label>
+                    <label data-tooltip="Link para você compartilhar essa tela, com suas configurações já preenchidas">Link com estes parâmetros:</label>
                     <textarea id="linkOutput" readonly rows="2"></textarea>
                     <button type="button" class="btn btn-secondary" onclick="App.copyLink()" style="width:100%">📋 Copiar Link</button>
                 </div>
@@ -53,16 +62,16 @@
             <h1>Simulador de preços</h1>
             <form id="simulatorForm">
                 <div class="input-group">
-                    <label for="quantity">Quantidade de Peças</label>
+                    <label for="quantity" data-tooltip="Quantidade de cópias idênticas que serão impressas.">Quantidade de Peças</label>
                     <input type="number" id="quantity" value="1" min="1">
                 </div>
                 <div class="row">
                     <div class="input-group">
-                        <label for="weight">Peso</label>
+                        <label for="weight" data-tooltip="Peso total de material usado (indicado pelo fatiador).">Peso</label>
                         <input type="text" id="weight" placeholder="Ex: 50g ou 1kg" autofocus>
                     </div>
                     <div class="input-group">
-                        <label for="minutes">Tempo</label>
+                        <label for="minutes" data-tooltip="Duração total da impressão estimada pelo fatiador.">Tempo</label>
                         <input type="text" id="minutes" placeholder="Ex: 30m ou 2h" value="0">
                     </div>
                 </div>
