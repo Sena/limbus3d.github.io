@@ -76,7 +76,7 @@ const App = {
     },
 
     saveToStorage() {
-        const fields = ['energyKwh', 'consumoKw', 'margin', 'pRolo', 'wRolo', 'machineCost', 'selEst', 'selImp'];
+        const fields = ['energyKwh', 'consumoKw', 'margin', 'pRolo', 'wRolo', 'machineCost', 'hourRate', 'selEst', 'selImp'];
         const data = {};
         fields.forEach(f => data[f] = document.getElementById(f).value);
         localStorage.setItem(this.storageKey, JSON.stringify(data));
@@ -117,7 +117,7 @@ const App = {
     },
 
     generateLink() {
-        const fields = ['energyKwh', 'consumoKw', 'margin', 'pRolo', 'wRolo', 'machineCost'];
+        const fields = ['energyKwh', 'consumoKw', 'margin', 'pRolo', 'wRolo', 'machineCost', 'hourRate'];
         const data = {};
         fields.forEach(f => data[f] = document.getElementById(f).value);
         const b64 = btoa(JSON.stringify(data));
@@ -140,8 +140,10 @@ const App = {
 
         const h = (mins * qty) / 60;
         const filament = ((grams * qty) / 1000) * parseFloat(document.getElementById('priceKg').value);
-        const energy = parseFloat(document.getElementById('consumoKw').value) * h * parseFloat(document.getElementById('energyKwh').value);
-        const total = (filament + energy + parseFloat(document.getElementById('machineCost').value)) * parseFloat(document.getElementById('margin').value);
+        const energy = parseFloat(document.getElementById('consumoKw').value) * h * parseFloat(document.getElementById('energyKwh').value);        
+        const setupCost = parseFloat(document.getElementById('machineCost').value) || 0;
+        const machineUsage = h * (parseFloat(document.getElementById('hourRate').value) || 0);        
+        const total = (filament + energy + setupCost + machineUsage) * parseFloat(document.getElementById('margin').value);
 
         document.getElementById('instruction').classList.add('hidden');
         document.getElementById('resultBox').classList.remove('hidden');
