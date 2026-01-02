@@ -35,16 +35,19 @@
                         <input type="number" id="margin" value="2.0" step="0.1">
                     </div>
                 </div>
-                <div class="row">
-                    <div class="input-group">
-                        <label for="pRolo" data-tooltip="Preço pago pelo carretel de filamento.">Preço Rolo</label>
-                        <input type="number" id="pRolo" value="100">
+
+                <div class="input-group">
+                    <label>Meus Filamentos</label>
+                    <div class="filament-header">
+                        <span>Nome</span>
+                        <span>R$</span>
+                        <span>gramas</span>
+                        <span></span>
                     </div>
-                    <div class="input-group">
-                        <label for="wRolo" data-tooltip="Peso líquido do material no rolo (padrão 1000g).">Peso Rolo (g)</label>
-                        <input type="number" id="wRolo" value="1000">
-                    </div>
+                    <div id="filamentList"></div>
+                    <button type="button" class="btn btn-add" onclick="App.addFilamentRow()">+ Novo Filamento</button>
                 </div>
+
                 <div class="row">
                     <div class="input-group">
                         <label for="machineCost" data-tooltip="Custo fixo por início de impressão (Setup/Fatiamento).">Setup (R$)</label>
@@ -55,7 +58,7 @@
                         <input type="number" id="hourRate" value="2.00" step="0.1">
                     </div>
                 </div>
-                
+
                 <div class="link-section">
                     <label data-tooltip="Link para você compartilhar essa tela, com suas configurações já preenchidas">Link com estes parâmetros:</label>
                     <textarea id="linkOutput" readonly rows="2"></textarea>
@@ -67,6 +70,10 @@
         <main class="container">
             <h1>Simulador de preços</h1>
             <form id="simulatorForm">
+                <div class="input-group">
+                    <label>Cores utilizadas nesta peça:</label>
+                    <div id="colorChoices" class="color-selector"></div>
+                </div>
                 <div class="input-group">
                     <label for="quantity" data-tooltip="Quantidade de cópias idênticas que serão impressas.">Quantidade de Peças</label>
                     <input type="number" id="quantity" value="1" min="1">
