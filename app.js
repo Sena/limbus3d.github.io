@@ -1,17 +1,20 @@
 const App = {
     energyData: {},
     printerData: {},
-    storageKey: 'calc3d_settings',
+    storageKey: 'calc3d_settings_v2',
     panelStateKey: 'calc3d_panel_open',
+    configFields: ['energyKwh', 'consumoKw', 'margin', 'machineCost', 'hourRate', 'selEst', 'selImp'],
+    filaments: [],
+    selectedFilaments: new Set(),
 
     async init() {
         this.bindEvents();
         await this.loadData();
-        
+
         this.loadFromStorage();
         this.parseUrlParams();
-        this.restorePanelState();        
-        this.checkConfigState();
+        this.restorePanelState();
+        this.renderFilamentList();
         this.calculate();
     },
 
@@ -27,39 +30,50 @@ const App = {
     populateSelectors() {
         const sEst = document.getElementById('selEst');
         const sImp = document.getElementById('selImp');
-        for (let k in this.energyData) {
-            let o = new Option(`${this.energyData[k].name} (R$${this.energyData[k].value})`, this.energyData[k].value);
-            sEst.add(o, sEst.options[sEst.options.length - 1]);
-        }
-        for (let brand in this.printerData) {
-            let g = document.createElement('optgroup'); g.label = brand;
-            this.printerData[brand].forEach(p => g.appendChild(new Option(`${p.model} (${p.watts * 1000}W)`, p.watts)));
-            sImp.add(g, sImp.options[sImp.options.length - 1]);
-        }
+        Object.entries(this.energyData).forEach(([k, v]) => sEst.add(new Option(`${v.name} (R$${v.value})`, v.value)));
+        Object.entries(this.printerData).forEach(([brand, models]) => {
+            let g = document.createElement('optgroup');
+            g.label = brand;
+            models.forEach(p => g.appendChild(new Option(`${p.model} (${p.watts * 1000}W)`, p.watts)));
+            sImp.add(g);
+        });
     },
 
     bindEvents() {
         document.getElementById('toggleConfig').onclick = () => {
-            const panel = document.getElementById('configPanel');
-            panel.classList.toggle('hidden');
-            
-            const isOpen = !panel.classList.contains('hidden');
-            localStorage.setItem(this.panelStateKey, isOpen);
-
-            document.getElementById('toggleConfig').classList.remove('attention-mode');
+            const p = document.getElementById('configPanel');
+            p.classList.toggle('hidden');
+            localStorage.setItem(this.panelStateKey, !p.classList.contains('hidden'));
         };
-
         document.getElementById('simulatorForm').oninput = () => this.calculate();
-        
         document.getElementById('configForm').oninput = (e) => {
             if (e.target.id === 'selEst' && e.target.value !== 'outros') document.getElementById('energyKwh').value = e.target.value;
             if (e.target.id === 'selImp' && e.target.value !== 'outros') document.getElementById('consumoKw').value = e.target.value;
-            
-            this.updatePriceKg();
             this.saveToStorage();
-            this.generateLink();
             this.calculate();
         };
+    },
+
+    addFilamentRow(name = '', price = 100, weight = 1000) {
+        this.filaments.push({name, price, weight});
+        this.renderFilamentList();
+        this.saveToStorage();
+    },
+
+    removeFilament(i) {
+        this.filaments.splice(i, 1);
+        this.selectedFilaments.delete(i);
+        this.renderFilamentList();
+        this.saveToStorage();
+        this.calculate();
+        this.renderColorChoices();
+    },
+
+    updateFilament(i, f, v) {
+        this.filaments[i][f] = v;
+        this.saveToStorage();
+        this.calculate();
+        this.renderColorChoices();
     },
 
     restorePanelState() {
@@ -69,25 +83,59 @@ const App = {
         }
     },
 
-    updatePriceKg() {
-        const pR = parseFloat(document.getElementById('pRolo').value) || 0;
-        const wR = parseFloat(document.getElementById('wRolo').value) || 1000;
-        document.getElementById('priceKg').value = ((pR / wR) * 1000).toFixed(2);
+    renderFilamentList() {
+        const cont = document.getElementById('filamentList');
+        cont.innerHTML = '';
+        this.filaments.forEach((f, i) => {
+            const div = document.createElement('div');
+            div.className = 'filament-item';
+            div.innerHTML = `
+                <input type="text" value="${f.name}" oninput="App.updateFilament(${i}, 'name', this.value)">
+                <input type="number" value="${f.price}" oninput="App.updateFilament(${i}, 'price', this.value)">
+                <input type="number" value="${f.weight}" oninput="App.updateFilament(${i}, 'weight', this.value)">
+                <button type="button" class="btn-remove" onclick="App.removeFilament(${i})">×</button>`;
+            cont.appendChild(div);
+        });
+    },
+
+    renderColorChoices() {
+        const cont = document.getElementById('colorChoices');
+        cont.innerHTML = '';
+        this.filaments.forEach((f, i) => {
+            if (!f.name) return;
+            const chip = document.createElement('div');
+            chip.className = `color-chip ${this.selectedFilaments.has(i) ? 'selected' : ''}`;
+            chip.innerText = f.name;
+            chip.onclick = () => {
+                this.selectedFilaments.has(i) ? this.selectedFilaments.delete(i) : this.selectedFilaments.add(i);
+                this.renderColorChoices();
+                this.calculate();
+            };
+            cont.appendChild(chip);
+        });
     },
 
     saveToStorage() {
-        const fields = ['energyKwh', 'consumoKw', 'margin', 'pRolo', 'wRolo', 'machineCost', 'hourRate', 'selEst', 'selImp'];
-        const data = {};
-        fields.forEach(f => data[f] = document.getElementById(f).value);
+        const data = {filaments: this.filaments};
+        this.configFields.forEach(f => data[f] = document.getElementById(f).value);
         localStorage.setItem(this.storageKey, JSON.stringify(data));
+        this.generateLink();
     },
 
     loadFromStorage() {
         const saved = localStorage.getItem(this.storageKey);
-        if (saved) {
-            const data = JSON.parse(saved);
-            this.fillFields(data);
+        if (!saved) {
+            document.getElementById('toggleConfig').classList.add('attention-mode');
+            this.addFilamentRow('Cor padrão', 120, 1000);
+            this.renderColorChoices();
+            return false;
         }
+        const data = JSON.parse(saved);
+        this.filaments = data.filaments || [];
+        this.configFields.forEach(k => {
+            if (data[k]) document.getElementById(k).value = data[k];
+        });
+        this.renderColorChoices();
     },
 
     parseUrlParams() {
@@ -96,53 +144,49 @@ const App = {
         if (raw) {
             try {
                 const data = JSON.parse(atob(raw));
-                this.fillFields(data);
-                this.saveToStorage(); 
-            } catch (e) { console.error("Erro decode URL"); }
-        }
-    },
-
-    fillFields(data) {
-        Object.keys(data).forEach(k => {
-            const el = document.getElementById(k);
-            if (el) el.value = data[k];
-        });
-        this.updatePriceKg();
-    },
-
-    checkConfigState() {
-        if (!localStorage.getItem(this.storageKey)) {
-            document.getElementById('toggleConfig').classList.add('attention-mode');
+                this.filaments = data.filaments || [];
+                this.configFields.forEach(k => {
+                    if (data[k]) document.getElementById(k).value = data[k];
+                });
+                this.renderFilamentList();
+            } catch (e) {
+                console.error("Erro decode URL");
+            }
         }
     },
 
     generateLink() {
-        const fields = ['energyKwh', 'consumoKw', 'margin', 'pRolo', 'wRolo', 'machineCost', 'hourRate'];
-        const data = {};
-        fields.forEach(f => data[f] = document.getElementById(f).value);
-        const b64 = btoa(JSON.stringify(data));
-        document.getElementById('linkOutput').value = `${window.location.origin}${window.location.pathname}?data=${b64}`;
+        const data = {filaments: this.filaments};
+        this.configFields.forEach(f => data[f] = document.getElementById(f).value);
+        document.getElementById('linkOutput').value = `${window.location.origin}${window.location.pathname}?data=${btoa(JSON.stringify(data))}`;
     },
 
     calculate() {
-        const weightRaw = document.getElementById('weight').value;
-        const timeRaw = document.getElementById('minutes').value;
+        const weight = this.parseUnit(document.getElementById('weight').value, 'w');
+        const mins = this.parseUnit(document.getElementById('minutes').value, 't');
         const qty = parseFloat(document.getElementById('quantity').value) || 1;
 
-        const grams = this.parseUnit(weightRaw, 'w');
-        const mins = this.parseUnit(timeRaw, 't');
-
-        if (!grams) {
-            document.getElementById('instruction').classList.remove('hidden');
+        if (!weight || this.filaments.length === 0) {
             document.getElementById('resultBox').classList.add('hidden');
+            document.getElementById('instruction').classList.remove('hidden');
             return;
         }
 
+        let maxPriceG = 0;
+        if (this.selectedFilaments.size > 0) {
+            this.selectedFilaments.forEach(i => {
+                const f = this.filaments[i];
+                maxPriceG = Math.max(maxPriceG, (f.price / f.weight));
+            });
+        } else {
+            maxPriceG = (this.filaments[0].price / this.filaments[0].weight);
+        }
+
         const h = (mins * qty) / 60;
-        const filament = ((grams * qty) / 1000) * parseFloat(document.getElementById('priceKg').value);
-        const energy = parseFloat(document.getElementById('consumoKw').value) * h * parseFloat(document.getElementById('energyKwh').value);        
+        const filament = (weight * qty) * maxPriceG;
+        const energy = parseFloat(document.getElementById('consumoKw').value) * h * parseFloat(document.getElementById('energyKwh').value);
         const setupCost = parseFloat(document.getElementById('machineCost').value) || 0;
-        const machineUsage = h * (parseFloat(document.getElementById('hourRate').value) || 0);        
+        const machineUsage = h * (parseFloat(document.getElementById('hourRate').value) || 0);
         const total = (filament + energy + setupCost + machineUsage) * parseFloat(document.getElementById('margin').value);
 
         document.getElementById('instruction').classList.add('hidden');
