@@ -50,7 +50,6 @@ export function remove(key) {
 	try {
 		store()?.removeItem(key);
 	} catch {
-		/* sem armazenamento disponível: nada a fazer */
 	}
 }
 
