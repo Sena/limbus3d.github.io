@@ -1,17 +1,15 @@
 /*
  * layout.css — casca do app: cabeçalho, abas, painéis e grades.
- * A composição do desktop é duas colunas na calculadora (entradas à esquerda,
- * preço fixo à direita) e grade de cartões nas configurações. No telefone tudo
- * empilha em uma coluna.
  */
 
 .app {
-	width: min(100%, 66rem);
+	width: min(100%, 68rem);
 	margin: 0 auto;
-	padding: var(--space-6) var(--space-5) var(--space-9);
+	padding: var(--space-6) var(--space-5) var(--space-8);
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-6);
+	min-height: 100dvh;
 }
 
 /* ------------------------------------------------------------------ cabeçalho */
@@ -27,14 +25,14 @@
 .brand {
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
+	gap: 1px;
 }
 
 .brand-name {
 	font-family: var(--font-display);
-	font-size: var(--text-lg);
+	font-size: var(--text-2xl);
 	font-weight: 600;
-	letter-spacing: -0.03em;
+	letter-spacing: -0.035em;
 	color: var(--ink);
 }
 
@@ -55,18 +53,17 @@
 	display: flex;
 	gap: var(--space-1);
 	padding: var(--space-1);
-	background: var(--surface-2);
+	background: var(--surface-3);
 	border-radius: var(--radius);
 }
 
 .tab {
-	position: relative;
 	flex: 1;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: var(--space-2);
-	padding: var(--space-3) var(--space-4);
+	padding: var(--space-3) var(--space-5);
 	border: 1px solid transparent;
 	border-radius: var(--radius-xs);
 	background: transparent;
@@ -86,6 +83,7 @@
 	background: var(--surface-1);
 	border-color: var(--border);
 	color: var(--ink);
+	font-weight: 600;
 }
 
 /* Ponto discreto: convida a olhar as configurações uma vez, sem pular na tela. */
@@ -93,8 +91,19 @@
 	width: 6px;
 	height: 6px;
 	border-radius: 50%;
-	background: var(--brand);
+	background: var(--accent);
 	flex-shrink: 0;
+}
+
+.tab-dot[hidden] {
+	display: block !important;
+	visibility: hidden;
+}
+
+html[data-tab='calc'] #panel-settings,
+html[data-tab='settings'] #panel-calc,
+html[data-client='on'] .tabs {
+	display: none;
 }
 
 /* ---------------------------------------------------------------------- painéis */
@@ -120,8 +129,8 @@
 }
 
 .fields {
-	display: grid;
-	grid-template-columns: 1fr;
+	display: flex;
+	flex-direction: column;
 	gap: var(--space-4);
 }
 
@@ -163,20 +172,29 @@
 	justify-content: space-between;
 	gap: var(--space-4);
 	flex-wrap: wrap;
+	margin-top: auto;
+	padding-top: var(--space-2);
+	border-top: 1px solid var(--border);
 	font-size: var(--text-xs);
-	color: var(--muted);
-}
-
-.app-footer a {
 	color: var(--muted);
 }
 
 /* ------------------------------------------------------------- telas maiores */
 
 @media (min-width: 52rem) {
+	.app {
+		padding: var(--space-8) var(--space-6) var(--space-9);
+		gap: var(--space-7);
+	}
+
 	.calc-layout {
-		grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+		grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
 		gap: var(--space-6);
+	}
+
+	.calc-layout > :last-child {
+		position: sticky;
+		top: var(--space-6);
 	}
 
 	.settings-grid {
@@ -187,19 +205,19 @@
 		grid-column: 1 / -1;
 	}
 
-	.fields-3 {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+	.card {
+		padding: var(--space-6);
 	}
 
 	.tabs {
 		align-self: flex-start;
-		min-width: 22rem;
+		min-width: 24rem;
 	}
 }
 
 @media (max-width: 30rem) {
 	.app {
-		padding: var(--space-5) var(--space-4) var(--space-8);
+		padding: var(--space-5) var(--space-4) var(--space-7);
 		gap: var(--space-5);
 	}
 

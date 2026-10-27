@@ -2,6 +2,7 @@
 .playwright-cli/
 .taste-skill/
 node_modules/
+qa/.artifacts/
 
 # Sistema operacional
 .DS_Store

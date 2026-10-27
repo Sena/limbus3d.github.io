@@ -45,7 +45,8 @@ test('a configuração padrão permite calcular sem nenhum ajuste', () => {
 });
 
 test('isDefaultConfig reconhece quando o usuário personalizou', () => {
-	assert.equal(isDefaultConfig({ ...createDefaultConfig(), margin: '3' }), false);
-	assert.equal(isDefaultConfig({ ...createDefaultConfig(), margin: '2' }), false, 'valor diferente do padrão textual');
+	assert.equal(isDefaultConfig({ ...createDefaultConfig(), markup: '3' }), false);
+	assert.equal(isDefaultConfig({ ...createDefaultConfig(), markup: '2' }), false, 'valor diferente do padrão textual');
+	assert.equal(isDefaultConfig({ ...createDefaultConfig(), taxRate: '6' }), false);
 	assert.equal(isDefaultConfig(null), true);
 });

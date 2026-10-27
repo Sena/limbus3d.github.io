@@ -72,7 +72,12 @@ function applyClientMode() {
 	const nav = document.querySelector('.tabs');
 	if (nav instanceof HTMLElement) nav.hidden = state.clientMode;
 
-	if (state.clientMode) tabs.switchTab(TABS.CALC);
+	if (state.clientMode) {
+		document.documentElement.dataset.client = 'on';
+		tabs.switchTab(TABS.CALC);
+	} else {
+		document.documentElement.removeAttribute('data-client');
+	}
 }
 
 function toggleClientMode() {
@@ -95,23 +100,26 @@ function markSettingsSeen() {
 	storage.write(STORAGE_KEYS.settingsSeen, 'true');
 	updateSettingsDot();
 	calculator.recalculate();
-}
-
-async function init() {
+}async function init() {
 	state.clientMode = storage.read(STORAGE_KEYS.clientMode, 'false') === 'true';
 	state.settingsSeen = storage.read(STORAGE_KEYS.settingsSeen, 'false') === 'true';
 
 	theme.initTheme();
 
+	tabs.initTabs();
+	applyClientMode();
+	updateSettingsDot();
+
+	settings.hydrate();
+	filaments.initFilaments();
+
 	await loadTables();
 
 	settings.initSettings();
-	filaments.initFilaments();
 
 	presets.initPresets();
 	history.initHistory();
 
-	tabs.initTabs();
 	calculator.initCalculator();
 	share.initShare();
 	exports.initExport();
@@ -128,8 +136,6 @@ async function init() {
 	});
 
 	applyUrlInputs();
-	applyClientMode();
-	updateSettingsDot();
 
 	calculator.recalculate();
 	share.refreshLink();
