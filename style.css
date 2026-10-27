@@ -342,6 +342,106 @@ label[data-tooltip]:hover::before {
 }
 
 
+[data-theme="dark"] {
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --success: #10b981;
+    --error: #f87171;
+    --border: #334155;
+}
+
+[data-theme="dark"] .result-card {
+    background: #064e3b;
+    border-color: #065f46;
+}
+
+[data-theme="dark"] .filament-item {
+    background: #0f172a;
+}
+
+[data-theme="dark"] .filament-item input,
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background: #0f172a;
+    color: var(--text);
+}
+
+[data-theme="dark"] .color-chip {
+    background: #0f172a;
+    color: var(--text);
+}
+
+[data-theme="dark"] .btn-secondary {
+    background: #334155;
+    color: var(--text);
+}
+
+.top-controls {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    z-index: 100;
+}
+
+.btn-top {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.btn-top:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.history-panel {
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    width: 300px;
+    max-height: 400px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    z-index: 200;
+    overflow-y: auto;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.history-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+.history-item {
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    background: var(--bg);
+}
+
 @media (max-width: 850px) {
     .main-wrapper {
         flex-direction: column;
@@ -355,5 +455,11 @@ label[data-tooltip]:hover::before {
 
     .container {
         order: 1;
+    }
+
+    .top-controls {
+        position: static;
+        justify-content: center;
+        margin-bottom: 10px;
     }
 }

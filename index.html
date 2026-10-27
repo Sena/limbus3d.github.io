@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Impressão 3D</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
+    <div class="top-controls">
+        <button type="button" class="btn-top" id="toggleTheme" title="Alternar tema claro/escuro">🌓 Tema</button>
+        <button type="button" class="btn-top" id="toggleClientMode" title="Modo cliente (esconde custos internos)">👤 Modo Cliente: <span id="clientModeStatus">OFF</span></button>
+        <button type="button" class="btn-top" id="toggleHistory" title="Histórico de cálculos">📜 Histórico</button>
+    </div>
     <div class="main-wrapper">
         <aside id="configPanel" class="config-panel hidden">
             <h2>Configuração Mestra</h2>
@@ -75,10 +82,24 @@
                     </small>
                 </div>
 
+                <div class="input-group">
+                    <label>Presets (Salvar configuração)</label>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="presetName" placeholder="Nome do preset" style="flex:1">
+                        <button type="button" class="btn btn-add" onclick="App.savePreset()" style="width:auto">Salvar</button>
+                    </div>
+                    <select id="presetSelect" onchange="App.loadPreset(this.value)" style="margin-top:5px;">
+                        <option value="">Carregar preset...</option>
+                    </select>
+                    <button type="button" class="btn-remove" onclick="App.deletePreset()" style="margin-top:5px; width:100%">Excluir preset selecionado</button>
+                </div>
+
                 <div class="link-section">
                     <label data-tooltip="Link para você compartilhar essa tela, com suas configurações já preenchidas">Link com estes parâmetros:</label>
                     <textarea id="linkOutput" readonly rows="2"></textarea>
                     <button type="button" class="btn btn-secondary" onclick="App.copyLink()" style="width:100%">📋 Copiar Link</button>
+                    <button type="button" class="btn btn-secondary" onclick="App.showQRCode()" style="width:100%; margin-top:5px">📱 Gerar QR Code</button>
+                    <div id="qrContainer" style="text-align:center; margin-top:10px;"></div>
                 </div>
             </form>
         </aside>
@@ -112,16 +133,29 @@
                         <strong>Como preencher:</strong>
                         <ul>
                             <li><strong>Peso:</strong> Use números ou unidades (Ex: <code>50g</code>, <code>1kg</code>).</li>
-                            <li><strong>Tempo:</strong> Use minutos ou horas (Ex: <code>45m</code>, <code>2h</code>).</li>
+                            <li><strong>Tempo:</strong> Use minutos ou horas (Ex: <code>45m</code>, <code>2h</code>, <code>1:10</code>).</li>
                         </ul>
                     </div>
                     <div id="resultBox" class="hidden">
                         <div class="result-label">Preço Total Estimado</div>
                         <div id="finalPrice" style="font-size: 2.5rem; font-weight: 800; color: var(--success);">R$ 0,00</div>
+                        <div class="result-actions" style="display:flex; gap:5px; margin-top:10px; flex-wrap:wrap;">
+                            <button type="button" class="btn btn-secondary" onclick="App.saveToHistory()" style="flex:1; min-width:100px">💾 Salvar no Histórico</button>
+                            <button type="button" class="btn btn-secondary" onclick="App.generatePDF()" style="flex:1; min-width:100px">📄 Gerar PDF</button>
+                        </div>
                     </div>
                 </div>
             </form>
         </main>
+    </div>
+
+    <div id="historyPanel" class="history-panel hidden">
+        <div class="history-header">
+            <h3>Histórico de Cálculos</h3>
+            <button type="button" onclick="App.toggleHistory()" class="btn-remove">×</button>
+        </div>
+        <div id="historyList" class="history-list"></div>
+        <button type="button" class="btn btn-secondary" onclick="App.clearHistory()" style="width:100%; margin-top:10px">Limpar Histórico</button>
     </div>
 
     <button id="toggleConfig" class="btn-config-trigger" title="Configurações">⚙️</button>
