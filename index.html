@@ -23,9 +23,15 @@
 			const root = document.documentElement;
 			const client = saved.client === 'true';
 
+			let prefersDark = true;
+			try {
+				prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
+			} catch {
+			}
+
 			root.dataset.theme = saved.theme === 'dark' || saved.theme === 'light'
 				? saved.theme
-				: (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+				: (prefersDark ? 'dark' : 'light');
 
 			root.dataset.tab = !client && saved.tab === 'settings' ? 'settings' : 'calc';
 			if (client) root.dataset.client = 'on';

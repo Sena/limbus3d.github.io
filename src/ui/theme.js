@@ -17,8 +17,9 @@ export function resolveTheme() {
 	const saved = storage.read(STORAGE_KEYS.theme, '');
 	if (saved === DARK || saved === LIGHT) return saved;
 
-	const prefersDark = globalThis.matchMedia?.('(prefers-color-scheme: dark)')?.matches;
-	return prefersDark ? DARK : LIGHT;
+	const media = globalThis.matchMedia?.('(prefers-color-scheme: dark)');
+	if (!media) return DARK;
+	return media.matches ? DARK : LIGHT;
 }
 
 /**

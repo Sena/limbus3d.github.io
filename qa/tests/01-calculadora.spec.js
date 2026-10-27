@@ -62,3 +62,26 @@ test('abre pronto, sem se mexer, com tema e modo salvos', async ({ page }) => {
 	await page.waitForTimeout(700);
 	expect(await page.evaluate(() => window.__deslocamento)).toBeLessThan(0.01);
 });
+
+test('sem escolha salva, o tema segue o sistema', async ({ page }) => {
+	await page.emulateMedia({ colorScheme: 'light' });
+	await page.goto('/');
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+	await page.emulateMedia({ colorScheme: 'dark' });
+	await page.reload();
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
+
+test('quando não dá para saber a preferência, o tema é o escuro', async ({ page }) => {
+	await page.addInitScript(() => {
+		try {
+			window.matchMedia = undefined;
+		} catch {
+		}
+	});
+
+	await page.goto('/');
+
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
