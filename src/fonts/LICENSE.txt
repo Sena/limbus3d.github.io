@@ -1,0 +1,17 @@
+As duas famílias de fonte usadas por este projeto são distribuídas sob a
+SIL Open Font License 1.1, que permite uso, modificação e redistribuição
+(inclusive embutidas num site), desde que o aviso de licença seja mantido.
+
+Inter
+  Autor: Rasmus Andersson
+  https://github.com/rsms/inter
+  Licença: SIL Open Font License 1.1 — https://openfontlicense.org
+
+Space Grotesk
+  Autor: Florian Karsten (derivada da Space Mono, de Colophon Foundry)
+  https://github.com/floriankarsten/space-grotesk
+  Licença: SIL Open Font License 1.1 — https://openfontlicense.org
+
+Os arquivos .woff2 desta pasta são os subconjuntos latinos servidos pelo
+Google Fonts e redistribuídos aqui para que a página não dependa de uma
+requisição externa para desenhar o texto.

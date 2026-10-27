@@ -1,71 +1,88 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Impressão 3D</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Calculadora de Impressão 3D — Limbus</title>
+	<meta name="description" content="Calcule o preço de impressão 3D a partir do peso, do tempo de impressão, do filamento, da energia e do custo da máquina.">
+	<meta name="theme-color" content="#f7f9fa" media="(prefers-color-scheme: light)">
+	<meta name="theme-color" content="#0b0e11" media="(prefers-color-scheme: dark)">
+
+	<script>
+		(() => {
+			let saved = {};
+			try {
+				saved = {
+					theme: localStorage.getItem('calc3d_theme'),
+					client: localStorage.getItem('calc3d_client_mode'),
+					tab: localStorage.getItem('calc3d_tab'),
+				};
+			} catch {
+			}
+
+			const root = document.documentElement;
+			const client = saved.client === 'true';
+
+			let prefersDark = true;
+			try {
+				prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
+			} catch {
+			}
+
+			root.dataset.theme = saved.theme === 'dark' || saved.theme === 'light'
+				? saved.theme
+				: (prefersDark ? 'dark' : 'light');
+
+			root.dataset.tab = !client && saved.tab === 'settings' ? 'settings' : 'calc';
+			if (client) root.dataset.client = 'on';
+		})();
+	</script>
+
+	<link rel="preload" href="src/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="src/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+	<link rel="stylesheet" href="src/fonts/fonts.css">
+	<link rel="stylesheet" href="src/styles/tokens.css">
+	<link rel="stylesheet" href="src/styles/base.css">
+	<link rel="stylesheet" href="src/styles/layout.css">
+	<link rel="stylesheet" href="src/styles/components.css">
+
+	<script defer src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+	<script type="module" src="src/main.js"></script>
 </head>
 <body>
-    <div class="top-controls">
-        <button type="button" class="btn-top" id="toggleTheme" title="Alternar tema claro/escuro">🌓 Tema</button>
-        <button type="button" class="btn-top" id="toggleClientMode" title="Modo cliente (esconde custos internos)">👤 Modo Cliente: <span id="clientModeStatus">OFF</span></button>
-        <button type="button" class="btn-top" id="toggleHistory" title="Histórico de cálculos">📜 Histórico</button>
-    </div>
-    <div class="main-wrapper">
-        <aside id="configPanel" class="config-panel hidden">
-            <h2>Configuração Mestra</h2>
-            <form id="configForm">
-                <div class="row">
-                    <div class="input-group">
-                        <label for="selEst" data-tooltip="Selecione o estado para carregar a tarifa média de energia automaticamente.">Estado (Tarifa)</label>
-                        <select id="selEst"><option value="outros">Manual</option></select>
-                    </div>
-                    <div class="input-group">
-                        <label for="energyKwh" data-tooltip="Custo total por kWh, incluindo impostos (ICMS, PIS/COFINS).">kWh (R$)</label>
-                        <input type="number" id="energyKwh" value="0.92" step="0.01">
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label for="selImp" data-tooltip="Modelo da impressora para ajuste de consumo base.">Impressora</label>
-                    <select id="selImp"><option value="outros">Personalizado</option></select>
-                </div>
-                <div class="row">
-                    <div class="input-group">
-                        <label for="consumoKw" data-tooltip="Consumo elétrico médio da impressora durante o funcionamento.">Consumo (kW)</label>
-                        <input type="number" id="consumoKw" value="0.07" step="0.001">
-                    </div>
-                    <div class="input-group">
-                        <label for="margin" data-tooltip="Fator de lucro e custos fixos (2.0 = 100% de margem).">Margem</label>
-                        <input type="number" id="margin" value="2.0" step="0.1">
-                    </div>
-                </div>
+	<div class="app">
+		<header class="app-header">
+			<div class="brand">
+				<span class="brand-name">Limbus 3D</span>
+				<span class="brand-sub">Calculadora de impressão 3D</span>
+			</div>
 
-                <div class="input-group">
-                    <label>Meus Filamentos</label>
-                    <div class="filament-header">
-                        <span>Nome</span>
-                        <span>R$</span>
-                        <span>gramas</span>
-                        <span></span>
-                    </div>
-                    <div id="filamentList"></div>
-                    <button type="button" class="btn btn-add" onclick="App.addFilamentRow()">+ Novo Filamento</button>
-                </div>
+			<div class="header-actions">
+				<button type="button" class="switch" id="clientToggle" role="switch" aria-checked="false" title="Esconde as configurações internas de custo">
+					<span class="switch-track" aria-hidden="true"></span>
+					<span class="switch-text">Modo cliente</span>
+				</button>
 
-                <div class="row">
-                    <div class="input-group">
-                        <label for="machineCost" data-tooltip="Custo fixo por início de impressão (Setup/Fatiamento).">Setup (R$)</label>
-                        <input type="number" id="machineCost" value="8">
-                    </div>
-                    <div class="input-group">
-                        <label for="hourRate" data-tooltip="Custo de depreciação, manutenção e ocupação por hora de máquina ligada.">Máquina (R$/h)</label>
-                        <input type="number" id="hourRate" value="2.00" step="0.1">
-                    </div>
-                </div>
+				<button type="button" class="btn btn-icon" id="themeToggle" aria-label="Alternar entre tema claro e escuro" title="Alternar tema">
+					<svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+						<circle cx="12" cy="12" r="4"></circle>
+						<path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+					</svg>
+					<svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"></path>
+					</svg>
+				</button>
 
+				<button type="button" class="btn btn-icon" id="historyToggle" aria-label="Abrir histórico de cálculos" title="Histórico">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"></path>
+						<path d="M12 8v4.5l3 1.8"></path>
+					</svg>
+				</button>
+			</div>
+		</header>
                 <div class="row">
                     <div class="input-group">
                         <label for="failureRate" data-tooltip="Percentual para cobrir impressões com falha, retrabalhos e desperdício. Ex: 5% = adiciona 5% ao custo final.">Taxa de falha (%)</label>
@@ -94,71 +111,312 @@
                     <button type="button" class="btn-remove" onclick="App.deletePreset()" style="margin-top:5px; width:100%">Excluir preset selecionado</button>
                 </div>
 
-                <div class="link-section">
-                    <label data-tooltip="Link para você compartilhar essa tela, com suas configurações já preenchidas">Link com estes parâmetros:</label>
-                    <textarea id="linkOutput" readonly rows="2"></textarea>
-                    <button type="button" class="btn btn-secondary" onclick="App.copyLink()" style="width:100%">📋 Copiar Link</button>
-                    <button type="button" class="btn btn-secondary" onclick="App.showQRCode()" style="width:100%; margin-top:5px">📱 Gerar QR Code</button>
-                    <div id="qrContainer" style="text-align:center; margin-top:10px;"></div>
-                </div>
-            </form>
-        </aside>
+		<nav class="tabs" role="tablist" aria-label="Seções da calculadora">
+			<button type="button" class="tab" role="tab" id="tab-calc" aria-controls="panel-calc" aria-selected="true" data-tab="calc">
+				Calculadora
+			</button>
+			<button type="button" class="tab" role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" tabindex="-1" data-tab="settings">
+				Configurações
+				<span class="tab-dot" id="settingsDot" aria-hidden="true" hidden></span>
+			</button>
+		</nav>
 
-        <main class="container">
-            <h1>Simulador de preços</h1>
-            <form id="simulatorForm">
-                <div class="input-group">
-                    <label>Cores utilizadas nesta peça:</label>
-                    <div id="colorChoices" class="color-selector"></div>
-                </div>
-                <div class="input-group">
-                    <label for="quantity" data-tooltip="Quantidade de cópias idênticas que serão impressas.">Quantidade de Peças</label>
-                    <input type="number" id="quantity" value="1" min="1">
-                </div>
-                <div class="row">
-                    <div class="input-group">
-                        <label for="weight" data-tooltip="Peso total de material usado (indicado pelo fatiador).">Peso</label>
-                        <input type="text" id="weight" placeholder="Ex: 50g ou 1kg" autofocus>
-                    </div>
-                    <div class="input-group">
-                        <label for="minutes" data-tooltip="Duração total da impressão estimada pelo fatiador.">Tempo</label>
-                        <input type="text" id="minutes" placeholder="Ex: 30m ou 2h" value="0">
-                    </div>
-                </div>
+		<main>
+			<!-- ------------------------------------------------------------ calculadora -->
+			<section class="panel" id="panel-calc" role="tabpanel" aria-labelledby="tab-calc">
+				<div class="calc-layout">
+					<div class="card">
+						<div class="card-head">
+							<h1 class="card-title">Dados da peça</h1>
+							<span class="card-note">Preenchido pelo fatiador</span>
+						</div>
 
-                <input type="hidden" id="priceKg" value="100">
+						<div class="stack">
+							<div class="field">
+								<span class="field-label">Cores usadas nesta peça</span>
+								<div class="chips" id="colorChoices" role="group" aria-label="Filamentos usados nesta peça"></div>
+								<span class="field-hint">Sem nenhuma marcada, o cálculo usa o primeiro filamento da lista.</span>
+							</div>
 
-                <div class="result-card">
-                    <div id="instruction" class="instruction-msg">
-                        <strong>Como preencher:</strong>
-                        <ul>
-                            <li><strong>Peso:</strong> Use números ou unidades (Ex: <code>50g</code>, <code>1kg</code>).</li>
-                            <li><strong>Tempo:</strong> Use minutos ou horas (Ex: <code>45m</code>, <code>2h</code>, <code>1:10</code>).</li>
-                        </ul>
-                    </div>
-                    <div id="resultBox" class="hidden">
-                        <div class="result-label">Preço Total Estimado</div>
-                        <div id="finalPrice" style="font-size: 2.5rem; font-weight: 800; color: var(--success);">R$ 0,00</div>
-                        <div class="result-actions" style="display:flex; gap:5px; margin-top:10px; flex-wrap:wrap;">
-                            <button type="button" class="btn btn-secondary" onclick="App.saveToHistory()" style="flex:1; min-width:100px">💾 Salvar no Histórico</button>
-                            <button type="button" class="btn btn-secondary" onclick="App.generatePDF()" style="flex:1; min-width:100px">📄 Gerar PDF</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </main>
-    </div>
+							<div class="fields-3">
+								<div class="field">
+									<label class="field-label" for="quantity">Quantidade</label>
+									<input class="input input-lg" type="number" id="quantity" value="1" min="1" step="1" inputmode="numeric">
+									<span class="field-hint">Cópias idênticas.</span>
+								</div>
 
-    <div id="historyPanel" class="history-panel hidden">
-        <div class="history-header">
-            <h3>Histórico de Cálculos</h3>
-            <button type="button" onclick="App.toggleHistory()" class="btn-remove">×</button>
-        </div>
-        <div id="historyList" class="history-list"></div>
-        <button type="button" class="btn btn-secondary" onclick="App.clearHistory()" style="width:100%; margin-top:10px">Limpar Histórico</button>
-    </div>
+								<div class="field">
+									<label class="field-label" for="weight">Peso</label>
+									<input class="input input-lg" type="text" id="weight" placeholder="50g" autocomplete="off">
+									<span class="field-hint">50g, 1kg ou só o número, em gramas.</span>
+								</div>
 
-    <button id="toggleConfig" class="btn-config-trigger" title="Configurações">⚙️</button>
-    <script src="app.js"></script>
+								<div class="field">
+									<label class="field-label" for="minutes">Tempo</label>
+									<input class="input input-lg" type="text" id="minutes" placeholder="2h" autocomplete="off">
+									<span class="field-hint">45m, 2h, 2h30 ou 1:10.</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card" id="calcEmpty">
+						<div class="empty">
+							<span class="empty-title">Preço estimado</span>
+							<p>Informe o peso para calcular. Os valores de custo já vêm preenchidos com padrões razoáveis, então dá para usar assim mesmo.</p>
+							<ul class="empty-list">
+								<li><span class="term">Peso</span><span>Peso de material indicado pelo fatiador.</span></li>
+								<li><span class="term">Tempo</span><span>Duração da impressão, em minutos ou horas.</span></li>
+								<li><span class="term">Cores</span><span>Marque os filamentos para usar o preço real de cada um.</span></li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="result" id="calcResult" hidden>
+							<div>
+								<p class="result-label">Preço total estimado</p>
+								<p class="result-value" id="finalPrice">R$ 0,00</p>
+							</div>
+
+							<div class="result-actions">
+								<button type="button" class="btn" id="saveHistory">Salvar no histórico</button>
+								<button type="button" class="btn" id="exportPdf">Gerar PDF</button>
+							</div>
+
+							<p class="card-note" id="refineHint" hidden>
+								Calculado com valores padrão.
+								<a href="#configuracoes" id="refineLink">Refinar os custos</a>
+							</p>
+						</div>
+				</div>
+			</section>
+
+			<!-- ----------------------------------------------------------- configurações -->
+			<section class="panel" id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
+				<div class="settings-grid">
+					<div class="card">
+						<div class="card-head">
+							<h2 class="card-title">Energia</h2>
+						</div>
+
+						<div class="fields">
+							<div class="field">
+								<label class="field-label" for="selEst-search">Estado</label>
+								<div class="combobox">
+									<input class="input" type="text" id="selEst-search" role="combobox" aria-expanded="false" aria-controls="selEst-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Digite para filtrar">
+									<input type="hidden" id="selEst">
+									<ul class="combobox-list" id="selEst-list" role="listbox" aria-label="Estados" hidden></ul>
+								</div>
+								<span class="field-hint">Digite para filtrar. Carrega a tarifa do estado.</span>
+							</div>
+
+							<div class="field">
+								<label class="field-label" for="energyKwh">kWh (R$)</label>
+								<input class="input" type="number" id="energyKwh" value="0.92" step="0.01" min="0">
+								<span class="field-hint">Custo do kWh na sua fatura, com impostos.</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<div class="card-head">
+							<h2 class="card-title">Impressora</h2>
+						</div>
+
+						<div class="fields">
+							<div class="field">
+								<label class="field-label" for="selImp-search">Modelo</label>
+								<div class="combobox">
+									<input class="input" type="text" id="selImp-search" role="combobox" aria-expanded="false" aria-controls="selImp-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Digite marca ou modelo">
+									<input type="hidden" id="selImp">
+									<ul class="combobox-list" id="selImp-list" role="listbox" aria-label="Impressoras" hidden></ul>
+								</div>
+								<span class="field-hint">Digite para filtrar por marca ou modelo.</span>
+							</div>
+
+							<div class="field">
+								<label class="field-label" for="consumoKw">Consumo (kW)</label>
+								<input class="input" type="number" id="consumoKw" value="0.07" step="0.001" min="0">
+								<span class="field-hint">Consumo médio durante a impressão.</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<div class="card-head">
+							<h2 class="card-title">Custos fixos</h2>
+						</div>
+
+						<div class="fields">
+							<div class="fields-2">
+								<div class="field">
+									<label class="field-label" for="machineCost">Setup por lote (R$)</label>
+									<input class="input" type="number" id="machineCost" value="8" step="0.5" min="0">
+									<span class="field-hint">Cobrado uma vez por impressão, não por peça.</span>
+								</div>
+
+								<div class="field">
+									<label class="field-label" for="hourRate">Máquina (R$/h)</label>
+									<input class="input" type="number" id="hourRate" value="2.00" step="0.1" min="0">
+									<span class="field-hint">Depreciação e manutenção.</span>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="field-label" for="markup">Multiplicador (markup)</label>
+								<input class="input" type="number" id="markup" value="2.0" step="0.1" min="0">
+								<span class="field-hint">Multiplica o custo. 2,0 = o dobro; 1,5 = 50% sobre o custo.</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<div class="card-head">
+							<h2 class="card-title">Perdas e acabamento</h2>
+						</div>
+
+						<div class="fields">
+							<div class="fields-2">
+								<div class="field">
+									<label class="field-label" for="failureRate">Taxa de falha (%)</label>
+									<input class="input" type="number" id="failureRate" value="5" step="1" min="0" max="50">
+									<span class="field-hint">Só sobre material, energia e máquina.</span>
+								</div>
+
+								<div class="field">
+									<label class="field-label" for="postProcessing">Pós-processamento (R$)</label>
+									<input class="input" type="number" id="postProcessing" value="0" step="1" min="0">
+									<span class="field-hint">Valor por peça.</span>
+								</div>
+							</div>
+
+							<p class="note">
+								<strong>Pós-processamento</strong> é o que acontece depois que a impressão termina: remover
+								suportes, lixar, preencher, pintar, polir. Informe o valor médio por peça e ele é
+								multiplicado pela quantidade.
+							</p>
+						</div>
+					</div>
+
+					<div class="card">
+						<div class="card-head">
+							<h2 class="card-title">Impostos e taxas</h2>
+						</div>
+
+						<div class="fields">
+							<div class="fields-2">
+								<div class="field">
+									<label class="field-label" for="taxRate">Imposto (%)</label>
+									<input class="input" type="number" id="taxRate" value="0" step="0.1" min="0" max="50">
+									<span class="field-hint">Sobre o preço de venda.</span>
+								</div>
+
+								<div class="field">
+									<label class="field-label" for="cardFeeRate">Taxa do cartão (%)</label>
+									<input class="input" type="number" id="cardFeeRate" value="0" step="0.1" min="0" max="20">
+									<span class="field-hint">Maquininha ou gateway.</span>
+								</div>
+							</div>
+
+							<p class="note">
+								<strong>Os dois saem do preço, não entram em cima dele.</strong> O valor final é dividido
+								por (1 − taxa), então a taxa é paga pelo preço cobrado sem reduzir o seu markup. Com
+								10% no total, um preço de R$ 100,00 vira R$ 111,11.
+							</p>
+						</div>
+					</div>
+
+					<div class="card card-span">
+						<div class="card-head">
+							<h2 class="card-title">Meus filamentos</h2>
+							<span class="card-note">Preço do rolo e peso do rolo</span>
+						</div>
+
+						<div class="filament-head" aria-hidden="true">
+							<span>Nome</span>
+							<span>R$</span>
+							<span>gramas</span>
+							<span></span>
+						</div>
+
+						<div class="stack" id="filamentList"></div>
+
+						<button type="button" class="btn btn-block" id="addFilament" style="margin-top: var(--space-3)">
+							Adicionar filamento
+						</button>
+					</div>
+
+					<div class="card">
+						<div class="card-head">
+							<h2 class="card-title">Presets</h2>
+							<span class="card-note">Configuração salva</span>
+						</div>
+
+						<div class="fields">
+							<div class="row-tight">
+								<input class="input" type="text" id="presetName" placeholder="Nome do preset" autocomplete="off">
+								<button type="button" class="btn" id="presetSave">Salvar</button>
+							</div>
+
+							<div class="field">
+								<label class="field-label" for="presetSelect">Carregar preset</label>
+								<select class="select" id="presetSelect">
+									<option value="">Selecione…</option>
+								</select>
+							</div>
+
+							<button type="button" class="btn btn-danger btn-block" id="presetDelete">Excluir preset selecionado</button>
+						</div>
+					</div>
+
+					<div class="card">
+						<div class="card-head">
+							<h2 class="card-title">Compartilhar</h2>
+							<span class="card-note">Link com esta configuração</span>
+						</div>
+
+						<div class="link-box">
+							<textarea class="textarea" id="linkOutput" readonly rows="2" aria-label="Link com a configuração atual"></textarea>
+
+							<div class="row">
+								<button type="button" class="btn btn-primary" id="copyLink">Copiar link</button>
+								<button type="button" class="btn" id="qrButton">Gerar QR Code</button>
+							</div>
+
+							<div class="qr-slot" id="qrContainer"></div>
+
+							<span class="field-hint">
+								O link também aceita os parâmetros q (quantidade), w (peso) e t (tempo).
+								Exemplo: ?q=3&amp;w=50g&amp;t=1:10
+							</span>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="app-footer">
+			<span>Os valores são estimativas. Confira a tarifa na sua fatura de energia.</span>
+		</footer>
+	</div>
+
+	<dialog class="sheet" id="historySheet" aria-labelledby="historyTitle">
+		<div class="sheet-inner">
+			<div class="sheet-head">
+				<h2 class="card-title" id="historyTitle">Histórico de cálculos</h2>
+				<button type="button" class="btn btn-icon" id="historyClose" aria-label="Fechar histórico">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+						<path d="M6 6l12 12M18 6L6 18"></path>
+					</svg>
+				</button>
+			</div>
+
+			<div class="history-list" id="historyList"></div>
+
+			<button type="button" class="btn btn-danger btn-block" id="historyClear">Limpar histórico</button>
+		</div>
+	</dialog>
+
+	<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>
