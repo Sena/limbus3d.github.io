@@ -1,0 +1,215 @@
+/*
+ * layout.css — casca do app: cabeçalho, abas, painéis e grades.
+ * A composição do desktop é duas colunas na calculadora (entradas à esquerda,
+ * preço fixo à direita) e grade de cartões nas configurações. No telefone tudo
+ * empilha em uma coluna.
+ */
+
+.app {
+	width: min(100%, 66rem);
+	margin: 0 auto;
+	padding: var(--space-6) var(--space-5) var(--space-9);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-6);
+}
+
+/* ------------------------------------------------------------------ cabeçalho */
+
+.app-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-4);
+	flex-wrap: wrap;
+}
+
+.brand {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.brand-name {
+	font-family: var(--font-display);
+	font-size: var(--text-lg);
+	font-weight: 600;
+	letter-spacing: -0.03em;
+	color: var(--ink);
+}
+
+.brand-sub {
+	font-size: var(--text-xs);
+	color: var(--muted);
+}
+
+.header-actions {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+}
+
+/* ------------------------------------------------------------------------ abas */
+
+.tabs {
+	display: flex;
+	gap: var(--space-1);
+	padding: var(--space-1);
+	background: var(--surface-2);
+	border-radius: var(--radius);
+}
+
+.tab {
+	position: relative;
+	flex: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-2);
+	padding: var(--space-3) var(--space-4);
+	border: 1px solid transparent;
+	border-radius: var(--radius-xs);
+	background: transparent;
+	color: var(--ink-2);
+	font-size: var(--text-sm);
+	font-weight: 500;
+	transition: background var(--dur-2) var(--ease-standard),
+		color var(--dur-2) var(--ease-standard),
+		border-color var(--dur-2) var(--ease-standard);
+}
+
+.tab:hover {
+	color: var(--ink);
+}
+
+.tab[aria-selected='true'] {
+	background: var(--surface-1);
+	border-color: var(--border);
+	color: var(--ink);
+}
+
+/* Ponto discreto: convida a olhar as configurações uma vez, sem pular na tela. */
+.tab-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--brand);
+	flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------------- painéis */
+
+.panel {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-5);
+}
+
+.calc-layout {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--space-5);
+	align-items: start;
+}
+
+.settings-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--space-4);
+	align-items: start;
+}
+
+.fields {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--space-4);
+}
+
+.fields-2 {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--space-4);
+}
+
+.fields-3 {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--space-4);
+}
+
+.stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+}
+
+.row {
+	display: flex;
+	gap: var(--space-2);
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.row-tight {
+	display: flex;
+	gap: var(--space-2);
+	align-items: center;
+}
+
+/* ---------------------------------------------------------------------- rodapé */
+
+.app-footer {
+	display: flex;
+	justify-content: space-between;
+	gap: var(--space-4);
+	flex-wrap: wrap;
+	font-size: var(--text-xs);
+	color: var(--muted);
+}
+
+.app-footer a {
+	color: var(--muted);
+}
+
+/* ------------------------------------------------------------- telas maiores */
+
+@media (min-width: 52rem) {
+	.calc-layout {
+		grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+		gap: var(--space-6);
+	}
+
+	.settings-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.settings-grid > .card-span {
+		grid-column: 1 / -1;
+	}
+
+	.fields-3 {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.tabs {
+		align-self: flex-start;
+		min-width: 22rem;
+	}
+}
+
+@media (max-width: 30rem) {
+	.app {
+		padding: var(--space-5) var(--space-4) var(--space-8);
+		gap: var(--space-5);
+	}
+
+	.fields-3,
+	.fields-2 {
+		grid-template-columns: 1fr;
+	}
+
+	.header-actions {
+		width: 100%;
+		justify-content: space-between;
+	}
+}

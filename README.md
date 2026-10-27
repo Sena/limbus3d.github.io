@@ -1,103 +1,143 @@
 # Calculadora de Impressão 3D
 
-Calculadora para estimar preço de impressão 3D FDM com base em peso, tempo, filamento, energia e custos da máquina.
+Calculadora de preço para impressão 3D FDM. A partir do peso e do tempo que o
+fatiador mostra, ela soma filamento, energia, setup, hora de máquina, taxa de
+falha e pós-processamento, e aplica a margem.
 
-## Como testar localmente
+O app **funciona sem nenhuma configuração**: vem com custos e um filamento
+padrão razoáveis, então basta informar peso e tempo para ver o preço.
 
-Como o app carrega `energy.json` e `printers.json` via `fetch()`, é necessário servir os arquivos com um servidor HTTP.
+## Rodando localmente
 
-### Com Node.js (serve)
+O projeto é estático: nada é compilado. Só precisa de um servidor HTTP, porque
+as tabelas em `src/data` são carregadas via `fetch()`.
+
+```bash
+npm run dev          # sobe em http://localhost:8000
+```
+
+Qualquer servidor estático serve:
 
 ```bash
 npx serve . -l 8000
-```
-
-Acesse: [http://localhost:8000](http://localhost:8000)
-
-### Com Python
-
-```bash
-# Python 3
 python -m http.server 8000
 ```
 
-Acesse: [http://localhost:8000](http://localhost:8000)
+No VS Code, a extensão **Live Server** em `index.html` também funciona.
 
-### Com VS Code
+## Testes
 
-Instale a extensão **Live Server**, clique com o botão direito em `index.html` → **Open with Live Server**.
+```bash
+npm test             # node --test, sem dependências
+```
+
+Os testes cobrem a leitura dos campos (`parser`), o cálculo (`pricing`), o link
+compartilhável (`url`) e a formatação (`format`).
 
 ## Como usar
 
-### 1) Configurar custos (painel ⚙️)
+### Calculadora
 
-Clique na engrenagem no canto inferior esquerdo para abrir o **painel de configuração**.
+| Campo | O que aceita |
+| --- | --- |
+| **Quantidade** | Número de cópias idênticas |
+| **Peso** | `50g`, `1kg`, `1,5kg` ou só o número (gramas) |
+| **Tempo** | `45m`, `2h`, `2h30`, `1:10` (uma hora e dez) ou minutos |
 
-Campos principais:
+**Cores usadas nesta peça** são os filamentos marcados. Com mais de um marcado,
+o cálculo usa o **mais caro por grama** entre eles, para não vender abaixo do
+custo em peça multicolor. Sem nenhum marcado, vale o primeiro filamento da lista.
 
-| Campo | Descrição |
-|---|---|
-| **Estado (Tarifa)** | Seleciona tarifa média por estado. Pode usar "Manual" para colocar o valor direto. |
-| **kWh (R$)** | Valor do kWh na sua fatura (com impostos). |
-| **Impressora** | Seleciona sua impressora para sugerir consumo. Ou "Personalizado". |
-| **Consumo (kW)** | Consumo médio da impressora em impressão. |
-| **Margem** | Fator multiplicador. Ex: `2.0` = dobra o custo (100% de margem). |
-| **Meus Filamentos** | Cadastre seus rolos (nome, preço e peso do rolo). Selecione quais cores/filamentos vão ser usados na peça. |
-| **Setup (R$)** | Custo fixo por impressão (fatiamento/setup). |
-| **Máquina (R$/h)** | Custo por hora de máquina ligada (depreciação/manutenção). |
-| **Taxa de falha (%)** | Percentual para cobrir falhas, retrabalhos e desperdício. |
-| **Pós-processamento (R$)** | Custos após impressão: remoção de suportes, lixamento, acabamento, pintura etc. (valor por peça/lote). |
+### Configurações
 
-### 2) Calcular preço
+| Grupo | Para quê |
+| --- | --- |
+| **Energia** | Tarifa média do estado ou valor da sua fatura |
+| **Impressora** | Modelo (ajusta o consumo) ou consumo em kW na mão |
+| **Custos fixos** | Setup por impressão, R$/h de máquina e margem |
+| **Perdas e acabamento** | Taxa de falha (%) e pós-processamento por peça |
+| **Meus filamentos** | Nome, preço do rolo e peso do rolo |
+| **Presets** | Salvar e reusar uma configuração inteira com nome |
+| **Compartilhar** | Link e QR Code com a configuração atual |
 
-No simulador principal:
+A aba **Configurações** mostra um ponto ao lado do nome até você abri-la pela
+primeira vez — é o convite para revisar os padrões. Depois disso ele não
+incomoda mais.
 
-1. **Cores utilizadas nesta peça** - Selecione os filamentos que serão usados
-2. **Quantidade de Peças** - Quantas cópias idênticas
-3. **Peso** - Peso total indicado pelo fatiador. Aceita `g`, `kg` ou número
-4. **Tempo** - Tempo total indicado pelo fatiador. Aceita `m`, `h`, `HH:MM` ou número (em minutos)
+### Pós-processamento
 
-Exemplos válidos:
+É o que acontece **depois** que a impressão termina: remover suportes, lixar,
+preencher, pintar, polir. Informe o valor médio **por peça** e ele é
+multiplicado pela quantidade.
 
-- Peso: `50g`, `1kg`, `75`
-- Tempo: `45m`, `2h`, `1:10`, `90`
+### Modo cliente
 
-O preço total aparece automaticamente assim que peso e filamentos estiverem preenchidos.
+O interruptor no topo esconde a aba de configurações, para mostrar a tela sem
+os custos internos.
 
-## Parâmetros via URL
+## Parâmetros na URL
 
-É possível preencher os campos direto pela URL usando parâmetros curtos:
-
-| Parâmetro | Campo |
-|---|---|
-| `q` | Quantidade de peças |
-| `w` | Peso |
-| `t` | Tempo |
-
-**Exemplo:**
+| Parâmetro | Campo | Exemplo |
+| --- | --- | --- |
+| `q` | Quantidade | `?q=3` |
+| `w` | Peso | `?w=50g` |
+| `t` | Tempo | `?t=1:10` |
+| `data` | Configuração completa em base64 | gerado pelo botão *Copiar link* |
 
 ```
-http://localhost:8000/?q=3&w=50g&t=1:10
+https://calculadora.limbus.com.br/?q=3&w=50g&t=1:10
 ```
 
-Também é possível compartilhar a configuração completa usando o botão **"Copiar Link"** no painel de configuração. Esse link já salva filamentos, valores e configurações.
+## Estrutura
 
-## Recursos adicionais
+```
+index.html                página única, com as duas abas
+src/
+  main.js                 ponto de entrada: carrega dados e inicializa módulos
+  core/                   regra de negócio, sem DOM (é o que os testes cobrem)
+    constants.js          chaves de armazenamento, eventos, limites
+    config.js             campos, valores padrão, filamento padrão
+    parser.js             leitura de peso, tempo e quantidade
+    pricing.js            cálculo do orçamento
+    url.js                link compartilhável e parâmetros de URL
+    format.js             moeda, data, peso e duração em pt-BR
+    storage.js            localStorage tolerante a falhas
+    bus.js                barramento de eventos interno
+    state.js              estado compartilhado
+  ui/                     interface; cada arquivo cuida de um pedaço da tela
+  styles/
+    tokens.css            cores, tipografia, espaços, movimento
+    base.css              reset e estados de foco
+    layout.css            casca, abas, grades
+    components.css        cartões, campos, botões, resultado, histórico
+  data/
+    energy.json           tarifas por estado
+    printers.json         impressoras por fabricante, com consumo médio
+tests/                    testes de node --test
+```
 
-| Recurso | Como usar |
-|---|---|
-| **Tema claro/escuro** | Botão `Tema` no topo da tela |
-| **Modo Cliente** | Botão `Modo Cliente: ON/OFF` - alterna visualização |
-| **Histórico** | Botão `Histórico` para ver últimos cálculos salvos. Use `Salvar no Histórico` no resultado |
-| **Presets** | No painel de config, salve/carregue/exclua configurações completas |
-| **QR Code** | Gere QR do link compartilhável para abrir em outro dispositivo |
-| **Gerar PDF** | Gere orçamento em PDF direto do resultado |
-| **Compartilhar config** | Use `Copiar Link` ou `Gerar QR Code` no painel de configuração |
+Os módulos de `core` são funções puras: não conhecem o DOM e podem rodar em
+qualquer ambiente. Os módulos de `ui` conversam entre si pelo barramento de
+eventos (`bus.js`), e quem grava no `localStorage` é somente `ui/settings.js`,
+para não haver dois escritores no mesmo registro.
 
-## Dicas
+## Editando as tabelas
 
-- **Múltiplas cores**: Ao selecionar mais de um filamento, o cálculo usa o filamento **mais caro por grama** entre os selecionados.
-- **Taxa de falha**: Aplica sobre o subtotal (filamento + energia + setup + máquina + pós-processamento) antes da margem.
-- **Pós-processamento**: Geralmente é um valor fixo por peça. Multiplica pela quantidade automaticamente.
-- **Margem**: `2.0` é comum para cobrir lucro + custos. Ajuste conforme seu negócio.
-- **Link compartilhado**: Perfeito para enviar orçamento/configuração para outra pessoa.
+`src/data/energy.json` guarda a tarifa média por estado:
+
+```json
+{ "sp": { "name": "São Paulo", "value": 0.92 } }
+```
+
+`src/data/printers.json` guarda o consumo médio de cada modelo, em kW:
+
+```json
+{ "Bambu Lab": [{ "model": "A1 Mini", "watts": 0.045 }] }
+```
+
+O campo se chama `watts` por histórico, mas o valor está em kW.
+
+## Publicação
+
+O site é servido direto do repositório, sem build e sem passo de compilação.
+Qualquer alteração em `main` entra no ar como está. O domínio está em `CNAME`.

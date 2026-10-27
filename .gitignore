@@ -1,0 +1,8 @@
+# Artefatos locais de ferramentas de teste e navegador
+.playwright-cli/
+.taste-skill/
+node_modules/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

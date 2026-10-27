@@ -1,0 +1,114 @@
+/*
+ * tokens.css — variáveis de design do projeto.
+ * Paleta herdada do mini-commerce: marca ciano, neutros frios, raio 12/16px.
+ * Nenhum componente deve declarar cor, raio ou duração "na mão": use estes tokens.
+ */
+
+:root {
+	color-scheme: light;
+
+	/* ------------------------------------------------------------- escala de marca */
+	--brand-100: #cfeef8;
+	--brand-300: #8ce1ee;
+	--brand-500: #45d2e3;
+	--brand-600: #3fc2de;
+	--brand-700: #3097c4;
+	--brand-900: #236aaa;
+
+	/* ------------------------------------------------------------------- superfícies */
+	--bg: #f7f9fa;
+	--surface-1: #ffffff;
+	--surface-2: #f1f4f6;
+	--surface-3: #e7edf1;
+	--border: #e1e7eb;
+	--border-strong: #c4ced6;
+
+	/* ----------------------------------------------------------------------- tinta */
+	--ink: #0b0f12;
+	--ink-2: #4a555e;
+	--muted: #6b7680;
+
+	/* ----------------------------------------------------------------------- marca */
+	--brand: #236aaa;
+	--brand-ink: #ffffff;
+	--brand-soft: #e8f4f9;
+
+	/* --------------------------------------------------------------------- estados */
+	--danger: #b42318;
+	--danger-soft: #fef3f2;
+	--success: #067647;
+
+	/* --------------------------------------------------------------------- tipografia */
+	--font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+	--font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+	--text-xs: 0.75rem;
+	--text-sm: 0.8125rem;
+	--text-base: 0.9375rem;
+	--text-lg: 1.125rem;
+	--text-xl: 1.375rem;
+	--text-2xl: 1.75rem;
+	--text-3xl: 2.5rem;
+	--text-4xl: 3.25rem;
+
+	--leading-tight: 1.15;
+	--leading-normal: 1.5;
+	--leading-relaxed: 1.65;
+
+	/* ----------------------------------------------------------------------- espaços */
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 0.75rem;
+	--space-4: 1rem;
+	--space-5: 1.25rem;
+	--space-6: 1.5rem;
+	--space-7: 2rem;
+	--space-8: 2.5rem;
+	--space-9: 3.5rem;
+
+	/* --------------------------------------------------------------------- geometria */
+	--radius-xs: 8px;
+	--radius: 12px;
+	--radius-lg: 16px;
+	--radius-pill: 999px;
+
+	/* ----------------------------------------------------------------------- motion */
+	--dur-1: 120ms;
+	--dur-2: 180ms;
+	--dur-3: 240ms;
+	--dur-4: 320ms;
+	--ease-standard: cubic-bezier(0.2, 0, 0, 1);
+	--ease-out-back: cubic-bezier(0.16, 1, 0.3, 1);
+
+	/* ---------------------------------------------------------------------- efeitos */
+	--ring: 0 0 0 3px rgb(35 106 170 / 0.24);
+	--shadow-float: 0 16px 40px rgb(11 15 18 / 0.14);
+	--shadow-soft: 0 1px 2px rgb(11 15 18 / 0.04);
+}
+
+[data-theme='dark'] {
+	color-scheme: dark;
+
+	--bg: #0b0e11;
+	--surface-1: #12161a;
+	--surface-2: #191e24;
+	--surface-3: #222830;
+	--border: #2a3138;
+	--border-strong: #3a434c;
+
+	--ink: #eef3f7;
+	--ink-2: #a8b3bc;
+	--muted: #7c8791;
+
+	--brand: #45d2e3;
+	--brand-ink: #06121a;
+	--brand-soft: #0f2833;
+
+	--danger: #f97066;
+	--danger-soft: #2a1414;
+	--success: #4ade80;
+
+	--ring: 0 0 0 3px rgb(69 210 227 / 0.28);
+	--shadow-float: 0 16px 40px rgb(0 0 0 / 0.5);
+	--shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3);
+}
