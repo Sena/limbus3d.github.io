@@ -44,12 +44,13 @@ export function switchTab(tab) {
 		button.tabIndex = active ? 0 : -1;
 	}
 
+	document.documentElement.dataset.tab = target;
 	storage.write(STORAGE_KEYS.tab, target);
 	emit(EVENTS.TAB_CHANGED, { tab: target });
 }
 
 export function initTabs() {
-	const buttons = Array.from(document.querySelectorAll('[data-tab]'));
+	const buttons = Array.from(document.querySelectorAll('.tab[data-tab]'));
 
 	for (const button of buttons) {
 		button.addEventListener('click', () => switchTab(button.dataset.tab));

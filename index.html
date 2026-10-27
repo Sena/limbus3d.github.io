@@ -8,10 +8,34 @@
 	<meta name="theme-color" content="#f7f9fa" media="(prefers-color-scheme: light)">
 	<meta name="theme-color" content="#0b0e11" media="(prefers-color-scheme: dark)">
 
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+	<script>
+		(() => {
+			let saved = {};
+			try {
+				saved = {
+					theme: localStorage.getItem('calc3d_theme'),
+					client: localStorage.getItem('calc3d_client_mode'),
+					tab: localStorage.getItem('calc3d_tab'),
+				};
+			} catch {
+			}
 
+			const root = document.documentElement;
+			const client = saved.client === 'true';
+
+			root.dataset.theme = saved.theme === 'dark' || saved.theme === 'light'
+				? saved.theme
+				: (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+			root.dataset.tab = !client && saved.tab === 'settings' ? 'settings' : 'calc';
+			if (client) root.dataset.client = 'on';
+		})();
+	</script>
+
+	<link rel="preload" href="src/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="src/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+	<link rel="stylesheet" href="src/fonts/fonts.css">
 	<link rel="stylesheet" href="src/styles/tokens.css">
 	<link rel="stylesheet" href="src/styles/base.css">
 	<link rel="stylesheet" href="src/styles/layout.css">
@@ -91,20 +115,20 @@
 								<div class="field">
 									<label class="field-label" for="weight">Peso</label>
 									<input class="input input-lg" type="text" id="weight" placeholder="50g" autocomplete="off">
-									<span class="field-hint"><code>50g</code>, <code>1kg</code> ou número.</span>
+									<span class="field-hint">50g, 1kg ou só o número, em gramas.</span>
 								</div>
 
 								<div class="field">
 									<label class="field-label" for="minutes">Tempo</label>
 									<input class="input input-lg" type="text" id="minutes" placeholder="2h" autocomplete="off">
-									<span class="field-hint"><code>45m</code>, <code>2h</code> ou <code>1:10</code>.</span>
+									<span class="field-hint">45m, 2h, 2h30 ou 1:10.</span>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="card">
-						<div class="empty" id="calcEmpty">
+					<div class="card" id="calcEmpty">
+						<div class="empty">
 							<span class="empty-title">Preço estimado</span>
 							<p>Informe o peso para calcular. Os valores de custo já vêm preenchidos com padrões razoáveis, então dá para usar assim mesmo.</p>
 							<ul class="empty-list">
@@ -113,16 +137,17 @@
 								<li><span class="term">Cores</span><span>Marque os filamentos para usar o preço real de cada um.</span></li>
 							</ul>
 						</div>
+					</div>
 
-						<div class="result" id="calcResult" hidden>
+					<div class="result" id="calcResult" hidden>
 							<div>
 								<p class="result-label">Preço total estimado</p>
 								<p class="result-value" id="finalPrice">R$ 0,00</p>
 							</div>
 
 							<div class="result-actions">
-								<button type="button" class="btn btn-ghost" id="saveHistory">Salvar no histórico</button>
-								<button type="button" class="btn btn-ghost" id="exportPdf">Gerar PDF</button>
+								<button type="button" class="btn" id="saveHistory">Salvar no histórico</button>
+								<button type="button" class="btn" id="exportPdf">Gerar PDF</button>
 							</div>
 
 							<p class="card-note" id="refineHint" hidden>
@@ -130,7 +155,6 @@
 								<a href="#configuracoes" id="refineLink">Refinar os custos</a>
 							</p>
 						</div>
-					</div>
 				</div>
 			</section>
 
@@ -144,11 +168,13 @@
 
 						<div class="fields">
 							<div class="field">
-								<label class="field-label" for="selEst">Estado</label>
-								<select class="select" id="selEst">
-									<option value="outros">Manual</option>
-								</select>
-								<span class="field-hint">Carrega a tarifa média do estado.</span>
+								<label class="field-label" for="selEst-search">Estado</label>
+								<div class="combobox">
+									<input class="input" type="text" id="selEst-search" role="combobox" aria-expanded="false" aria-controls="selEst-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Digite para filtrar">
+									<input type="hidden" id="selEst">
+									<ul class="combobox-list" id="selEst-list" role="listbox" aria-label="Estados" hidden></ul>
+								</div>
+								<span class="field-hint">Digite para filtrar. Carrega a tarifa do estado.</span>
 							</div>
 
 							<div class="field">
@@ -166,11 +192,13 @@
 
 						<div class="fields">
 							<div class="field">
-								<label class="field-label" for="selImp">Modelo</label>
-								<select class="select" id="selImp">
-									<option value="outros">Personalizado</option>
-								</select>
-								<span class="field-hint">Ajusta o consumo médio da máquina.</span>
+								<label class="field-label" for="selImp-search">Modelo</label>
+								<div class="combobox">
+									<input class="input" type="text" id="selImp-search" role="combobox" aria-expanded="false" aria-controls="selImp-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Digite marca ou modelo">
+									<input type="hidden" id="selImp">
+									<ul class="combobox-list" id="selImp-list" role="listbox" aria-label="Impressoras" hidden></ul>
+								</div>
+								<span class="field-hint">Digite para filtrar por marca ou modelo.</span>
 							</div>
 
 							<div class="field">
@@ -189,9 +217,9 @@
 						<div class="fields">
 							<div class="fields-2">
 								<div class="field">
-									<label class="field-label" for="machineCost">Setup (R$)</label>
+									<label class="field-label" for="machineCost">Setup por lote (R$)</label>
 									<input class="input" type="number" id="machineCost" value="8" step="0.5" min="0">
-									<span class="field-hint">Por impressão iniciada.</span>
+									<span class="field-hint">Cobrado uma vez por impressão, não por peça.</span>
 								</div>
 
 								<div class="field">
@@ -202,9 +230,9 @@
 							</div>
 
 							<div class="field">
-								<label class="field-label" for="margin">Margem</label>
-								<input class="input" type="number" id="margin" value="2.0" step="0.1" min="0">
-								<span class="field-hint">Multiplica o custo total. <code>2.0</code> dobra o valor.</span>
+								<label class="field-label" for="markup">Multiplicador (markup)</label>
+								<input class="input" type="number" id="markup" value="2.0" step="0.1" min="0">
+								<span class="field-hint">Multiplica o custo. 2,0 = o dobro; 1,5 = 50% sobre o custo.</span>
 							</div>
 						</div>
 					</div>
@@ -219,7 +247,7 @@
 								<div class="field">
 									<label class="field-label" for="failureRate">Taxa de falha (%)</label>
 									<input class="input" type="number" id="failureRate" value="5" step="1" min="0" max="50">
-									<span class="field-hint">Cobre retrabalho e desperdício.</span>
+									<span class="field-hint">Só sobre material, energia e máquina.</span>
 								</div>
 
 								<div class="field">
@@ -233,6 +261,34 @@
 								<strong>Pós-processamento</strong> é o que acontece depois que a impressão termina: remover
 								suportes, lixar, preencher, pintar, polir. Informe o valor médio por peça e ele é
 								multiplicado pela quantidade.
+							</p>
+						</div>
+					</div>
+
+					<div class="card">
+						<div class="card-head">
+							<h2 class="card-title">Impostos e taxas</h2>
+						</div>
+
+						<div class="fields">
+							<div class="fields-2">
+								<div class="field">
+									<label class="field-label" for="taxRate">Imposto (%)</label>
+									<input class="input" type="number" id="taxRate" value="0" step="0.1" min="0" max="50">
+									<span class="field-hint">Sobre o preço de venda.</span>
+								</div>
+
+								<div class="field">
+									<label class="field-label" for="cardFeeRate">Taxa do cartão (%)</label>
+									<input class="input" type="number" id="cardFeeRate" value="0" step="0.1" min="0" max="20">
+									<span class="field-hint">Maquininha ou gateway.</span>
+								</div>
+							</div>
+
+							<p class="note">
+								<strong>Os dois saem do preço, não entram em cima dele.</strong> O valor final é dividido
+								por (1 − taxa), então a taxa é paga pelo preço cobrado sem reduzir o seu markup. Com
+								10% no total, um preço de R$ 100,00 vira R$ 111,11.
 							</p>
 						</div>
 					</div>
@@ -297,8 +353,8 @@
 							<div class="qr-slot" id="qrContainer"></div>
 
 							<span class="field-hint">
-								O link também aceita os parâmetros <code>q</code> (quantidade), <code>w</code> (peso) e
-								<code>t</code> (tempo). Exemplo: <code>?q=3&amp;w=50g&amp;t=1:10</code>.
+								O link também aceita os parâmetros q (quantidade), w (peso) e t (tempo).
+								Exemplo: ?q=3&amp;w=50g&amp;t=1:10
 							</span>
 						</div>
 					</div>
@@ -308,7 +364,6 @@
 
 		<footer class="app-footer">
 			<span>Os valores são estimativas. Confira a tarifa na sua fatura de energia.</span>
-			<a href="https://github.com/Sena/limbus3d.github.io" rel="noopener">Código no GitHub</a>
 		</footer>
 	</div>
 

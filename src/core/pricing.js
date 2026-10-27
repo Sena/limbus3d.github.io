@@ -1,13 +1,5 @@
 /**
  * pricing.js — o cálculo de preço, isolado do DOM.
- *
- * A ordem das contas é a mesma da versão anterior:
- *   filamento + energia + setup + máquina + pós-processamento
- *   → taxa de falha
- *   → margem
- *
- * O setup é cobrado uma vez por impressão (não por peça); tudo que depende de
- * tempo ou de quantidade é multiplicado.
  */
 
 /**
@@ -21,11 +13,13 @@
  * @typedef {Object} QuoteConfig
  * @property {number|string} energyKwh custo do kWh
  * @property {number|string} consumoKw consumo médio da máquina, em kW
- * @property {number|string} margin multiplicador aplicado no fim
- * @property {number|string} machineCost setup por impressão
+ * @property {number|string} markup multiplicador aplicado sobre o custo
+ * @property {number|string} machineCost setup por lote
  * @property {number|string} hourRate custo por hora de máquina
  * @property {number|string} failureRate percentual de perda
  * @property {number|string} postProcessing valor por peça, após imprimir
+ * @property {number|string} taxRate percentual de imposto
+ * @property {number|string} cardFeeRate percentual da taxa do cartão
  */
 
 /**
@@ -62,6 +56,15 @@ export function costPerGram(filament) {
 }
 
 /**
+ * @param {QuoteConfig} config
+ * @returns {number}
+ */
+export function feeRateOf(config) {
+	const total = toNumber(config?.taxRate) + toNumber(config?.cardFeeRate);
+	return Math.min(0.95, Math.max(0, total / 100));
+}
+
+/**
  * Calcula o orçamento de uma impressão.
  *
  * Sem peso informado ou sem nenhum filamento utilizável devolve `null`, que é
@@ -81,13 +84,16 @@ export function costPerGram(filament) {
  *   pricePerGram: number,
  *   filamentCost: number,
  *   energyCost: number,
- *   setupCost: number,
  *   machineCost: number,
+ *   setupCost: number,
  *   postProcessingCost: number,
+ *   failureBase: number,
  *   failureCost: number,
- *   baseCost: number,
- *   subtotal: number,
- *   margin: number
+ *   costTotal: number,
+ *   markup: number,
+ *   grossPrice: number,
+ *   feeRate: number,
+ *   fees: number
  * })}
  */
 export function calculateQuote(input) {
@@ -109,20 +115,26 @@ export function calculateQuote(input) {
 	const pricePerGram = Math.max(...pool.map(costPerGram));
 
 	const hours = (minutes * quantity) / 60;
+
 	const filamentCost = weightGrams * quantity * pricePerGram;
 	const energyCost = toNumber(config.consumoKw) * hours * toNumber(config.energyKwh);
-	const setupCost = toNumber(config.machineCost);
 	const machineCost = hours * toNumber(config.hourRate);
-	const postProcessingCost = toNumber(config.postProcessing) * quantity;
-
-	const baseCost = filamentCost + energyCost + setupCost + machineCost + postProcessingCost;
+	const failureBase = filamentCost + energyCost + machineCost;
 
 	const failureRate = toNumber(config.failureRate);
-	const failureCost = failureRate > 0 ? baseCost * (failureRate / 100) : 0;
-	const subtotal = baseCost + failureCost;
+	const failureCost = failureRate > 0 ? failureBase * (failureRate / 100) : 0;
 
-	const margin = toNumber(config.margin);
-	const total = subtotal * margin;
+	const setupCost = toNumber(config.machineCost);
+	const postProcessingCost = toNumber(config.postProcessing) * quantity;
+
+	const costTotal = failureBase + failureCost + setupCost + postProcessingCost;
+
+	const markup = toNumber(config.markup);
+	const grossPrice = costTotal * markup;
+
+	const feeRate = feeRateOf(config);
+	const total = grossPrice / (1 - feeRate);
+	const fees = total - grossPrice;
 
 	return {
 		total,
@@ -134,12 +146,15 @@ export function calculateQuote(input) {
 		pricePerGram,
 		filamentCost,
 		energyCost,
-		setupCost,
 		machineCost,
+		setupCost,
 		postProcessingCost,
+		failureBase,
 		failureCost,
-		baseCost,
-		subtotal,
-		margin,
+		costTotal,
+		markup,
+		grossPrice,
+		feeRate,
+		fees,
 	};
 }

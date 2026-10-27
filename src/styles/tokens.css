@@ -1,7 +1,6 @@
 /*
  * tokens.css — variáveis de design do projeto.
- * Paleta herdada do mini-commerce: marca ciano, neutros frios, raio 12/16px.
- * Nenhum componente deve declarar cor, raio ou duração "na mão": use estes tokens.
+ * Os pares de contraste são verificados por tests/contrast.test.js.
  */
 
 :root {
@@ -12,31 +11,42 @@
 	--brand-300: #8ce1ee;
 	--brand-500: #45d2e3;
 	--brand-600: #3fc2de;
-	--brand-700: #3097c4;
-	--brand-900: #236aaa;
+	--brand-700: #2fb0cd;
+	--brand-900: #10557a;
 
-	/* ------------------------------------------------------------------- superfícies */
-	--bg: #f7f9fa;
+	/* ------------------------------------------------------------------ superfícies */
+	--bg: #eef3f5;
 	--surface-1: #ffffff;
-	--surface-2: #f1f4f6;
-	--surface-3: #e7edf1;
-	--border: #e1e7eb;
-	--border-strong: #c4ced6;
+	--surface-2: #f4f8fa;
+	--surface-3: #e3eaef;
+	--border: #d5dfe5;
+	--border-strong: #6f7d89;
 
 	/* ----------------------------------------------------------------------- tinta */
-	--ink: #0b0f12;
-	--ink-2: #4a555e;
-	--muted: #6b7680;
+	--ink: #0a1116;
+	--ink-2: #33414a;
+	--muted: #55646e;
 
 	/* ----------------------------------------------------------------------- marca */
-	--brand: #236aaa;
+	--brand: #0f6f96;
 	--brand-ink: #ffffff;
-	--brand-soft: #e8f4f9;
+	--accent: #3fc2de;
+	--accent-hover: #2fb0cd;
+	--accent-ink: #04222c;
+	--accent-soft: #d9f1f8;
+
+	/* -------------------------------------------------------- painel de preço */
+	--result-bg: #0c161c;
+	--result-ink: #f2f9fb;
+	--result-muted: #a9c2cd;
+	--result-link: #6fdcea;
+	--result-line: rgb(255 255 255 / 0.24);
+	--result-hover: rgb(255 255 255 / 0.1);
 
 	/* --------------------------------------------------------------------- estados */
-	--danger: #b42318;
-	--danger-soft: #fef3f2;
-	--success: #067647;
+	--danger: #a8231a;
+	--danger-soft: #fdeceb;
+	--success: #05603a;
 
 	/* --------------------------------------------------------------------- tipografia */
 	--font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
@@ -48,8 +58,8 @@
 	--text-lg: 1.125rem;
 	--text-xl: 1.375rem;
 	--text-2xl: 1.75rem;
-	--text-3xl: 2.5rem;
-	--text-4xl: 3.25rem;
+
+	--text-price: clamp(2.625rem, 8vw, 3.75rem);
 
 	--leading-tight: 1.15;
 	--leading-normal: 1.5;
@@ -81,9 +91,9 @@
 	--ease-out-back: cubic-bezier(0.16, 1, 0.3, 1);
 
 	/* ---------------------------------------------------------------------- efeitos */
-	--ring: 0 0 0 3px rgb(35 106 170 / 0.24);
-	--shadow-float: 0 16px 40px rgb(11 15 18 / 0.14);
-	--shadow-soft: 0 1px 2px rgb(11 15 18 / 0.04);
+	--ring: 0 0 0 3px rgb(15 111 150 / 0.28);
+	--shadow-soft: 0 1px 2px rgb(10 17 22 / 0.06);
+	--shadow-float: 0 18px 44px rgb(10 17 22 / 0.18);
 }
 
 [data-theme='dark'] {
@@ -93,22 +103,32 @@
 	--surface-1: #12161a;
 	--surface-2: #191e24;
 	--surface-3: #222830;
-	--border: #2a3138;
-	--border-strong: #3a434c;
+	--border: #333c45;
+	--border-strong: #6b7883;
 
 	--ink: #eef3f7;
-	--ink-2: #a8b3bc;
-	--muted: #7c8791;
+	--ink-2: #b6c1ca;
+	--muted: #8b96a0;
 
 	--brand: #45d2e3;
 	--brand-ink: #06121a;
-	--brand-soft: #0f2833;
+	--accent: #45d2e3;
+	--accent-hover: #6ddceb;
+	--accent-ink: #06121a;
+	--accent-soft: #0f2833;
+
+	--result-bg: #191e24;
+	--result-ink: #eef3f7;
+	--result-muted: #b6c1ca;
+	--result-link: #45d2e3;
+	--result-line: #333c45;
+	--result-hover: rgb(255 255 255 / 0.08);
 
 	--danger: #f97066;
 	--danger-soft: #2a1414;
 	--success: #4ade80;
 
-	--ring: 0 0 0 3px rgb(69 210 227 / 0.28);
-	--shadow-float: 0 16px 40px rgb(0 0 0 / 0.5);
+	--ring: 0 0 0 3px rgb(69 210 227 / 0.32);
 	--shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3);
+	--shadow-float: 0 18px 44px rgb(0 0 0 / 0.5);
 }

@@ -1,5 +1,5 @@
 /*
- * components.css — cartões, campos, botões, chips, resultado, histórico e avisos.
+ * components.css — cartões, campos, combobox, botões, chips, preço e histórico.
  */
 
 /* ----------------------------------------------------------------------- cartões */
@@ -17,12 +17,12 @@
 	align-items: baseline;
 	justify-content: space-between;
 	gap: var(--space-3);
-	margin-bottom: var(--space-4);
+	margin-bottom: var(--space-5);
 }
 
 .card-title {
 	font-family: var(--font-display);
-	font-size: var(--text-base);
+	font-size: var(--text-lg);
 	font-weight: 600;
 	letter-spacing: -0.01em;
 }
@@ -30,6 +30,7 @@
 .card-note {
 	font-size: var(--text-xs);
 	color: var(--muted);
+	text-align: right;
 }
 
 .card-note a {
@@ -59,7 +60,6 @@
 }
 
 .input,
-.select,
 .textarea {
 	width: 100%;
 	padding: var(--space-3) var(--space-4);
@@ -69,18 +69,15 @@
 	border-radius: var(--radius-xs);
 	font-size: var(--text-base);
 	line-height: var(--leading-normal);
-	transition: border-color var(--dur-2) var(--ease-standard),
-		background var(--dur-2) var(--ease-standard);
+	transition: border-color var(--dur-2) var(--ease-standard);
 }
 
 .input:hover,
-.select:hover,
 .textarea:hover {
-	border-color: var(--muted);
+	border-color: var(--ink-2);
 }
 
 .input:focus,
-.select:focus,
 .textarea:focus {
 	outline: none;
 	border-color: var(--brand);
@@ -93,8 +90,8 @@
 
 .input-lg {
 	padding: var(--space-4);
-	font-size: var(--text-lg);
 	font-family: var(--font-display);
+	font-size: var(--text-xl);
 	font-weight: 500;
 	letter-spacing: -0.01em;
 }
@@ -106,14 +103,66 @@
 	word-break: break-all;
 }
 
-.select {
-	appearance: none;
-	background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
-		linear-gradient(135deg, var(--muted) 50%, transparent 50%);
-	background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
-	background-size: 5px 5px, 5px 5px;
-	background-repeat: no-repeat;
-	padding-right: var(--space-8);
+/* ---------------------------------------------------------------------- combobox */
+
+.combobox {
+	position: relative;
+}
+
+.combobox-list {
+	position: absolute;
+	z-index: 30;
+	top: calc(100% + 6px);
+	left: 0;
+	right: 0;
+	max-height: 15rem;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding: var(--space-1);
+	background: var(--surface-1);
+	border: 1px solid var(--border-strong);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-float);
+}
+
+.combobox-option {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-3);
+	padding: var(--space-2) var(--space-3);
+	border-radius: var(--radius-xs);
+	font-size: var(--text-sm);
+	color: var(--ink);
+	cursor: pointer;
+}
+
+.combobox-option:hover,
+.combobox-option.is-active {
+	background: var(--accent-soft);
+	color: var(--brand);
+}
+
+.combobox-option[aria-selected='true'] .combobox-label {
+	font-weight: 600;
+}
+
+.combobox-group {
+	flex-shrink: 0;
+	font-size: var(--text-xs);
+	color: var(--muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.combobox-option:hover .combobox-group,
+.combobox-option.is-active .combobox-group {
+	color: var(--brand);
+}
+
+.combobox-empty {
+	padding: var(--space-3);
+	font-size: var(--text-sm);
+	color: var(--muted);
 }
 
 /* ------------------------------------------------------------------------ botões */
@@ -138,7 +187,7 @@
 }
 
 .btn:hover {
-	background: var(--surface-2);
+	background: var(--surface-3);
 }
 
 .btn:active {
@@ -146,24 +195,19 @@
 }
 
 .btn-primary {
-	background: var(--brand);
-	border-color: var(--brand);
-	color: var(--brand-ink);
+	background: var(--accent);
+	border-color: var(--accent);
+	color: var(--accent-ink);
+	font-weight: 600;
 }
 
 .btn-primary:hover {
-	background: var(--brand-700);
-	border-color: var(--brand-700);
-}
-
-[data-theme='dark'] .btn-primary:hover {
-	background: var(--brand-600);
-	border-color: var(--brand-600);
+	background: var(--accent-hover);
+	border-color: var(--accent-hover);
 }
 
 .btn-danger {
 	color: var(--danger);
-	border-color: var(--border-strong);
 }
 
 .btn-danger:hover {
@@ -176,14 +220,16 @@
 }
 
 .btn-icon {
-	padding: var(--space-3);
+	padding: 0;
 	width: 2.5rem;
 	height: 2.5rem;
 	color: var(--ink-2);
+	border-color: var(--border);
 }
 
 .btn-icon:hover {
 	color: var(--ink);
+	border-color: var(--border-strong);
 }
 
 .btn-icon svg {
@@ -192,32 +238,19 @@
 	display: block;
 }
 
-/* A troca de ícone do tema é feita só por CSS, a partir do atributo do <html>. */
-.icon-moon {
+.btn-icon .icon-moon {
 	display: none;
 }
 
-[data-theme='dark'] .icon-sun {
+[data-theme='dark'] .btn-icon .icon-sun {
 	display: none;
 }
 
-[data-theme='dark'] .icon-moon {
+[data-theme='dark'] .btn-icon .icon-moon {
 	display: block;
 }
 
-/* O botão fantasma é só texto com borda implícita: usado dentro do cartão de preço. */
-.btn-ghost {
-	background: transparent;
-	border-color: var(--border);
-	color: var(--ink-2);
-}
-
-.btn-ghost:hover {
-	background: var(--surface-2);
-	color: var(--ink);
-}
-
-/* ---------------------------------------------------------------------- interruptor */
+/* --------------------------------------------------------------------- interruptor */
 
 .switch {
 	display: inline-flex;
@@ -238,8 +271,8 @@
 
 .switch-track {
 	position: relative;
-	width: 28px;
-	height: 16px;
+	width: 30px;
+	height: 17px;
 	border-radius: var(--radius-pill);
 	background: var(--surface-3);
 	transition: background var(--dur-2) var(--ease-standard);
@@ -251,11 +284,11 @@
 	position: absolute;
 	top: 2px;
 	left: 2px;
-	width: 12px;
-	height: 12px;
+	width: 13px;
+	height: 13px;
 	border-radius: 50%;
 	background: var(--surface-1);
-	box-shadow: 0 1px 2px rgb(11 15 18 / 0.25);
+	box-shadow: 0 1px 2px rgb(10 17 22 / 0.3);
 	transition: transform var(--dur-2) var(--ease-standard);
 }
 
@@ -265,12 +298,12 @@
 }
 
 .switch[aria-checked='true'] .switch-track {
-	background: var(--brand);
+	background: var(--accent);
 }
 
 .switch[aria-checked='true'] .switch-track::after {
-	background: var(--brand-ink);
-	transform: translateX(12px);
+	background: var(--accent-ink);
+	transform: translateX(13px);
 }
 
 /* ------------------------------------------------------------------------- chips */
@@ -279,8 +312,8 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--space-2);
-	min-height: 2.5rem;
 	align-items: center;
+	min-height: 2.5rem;
 }
 
 .chip {
@@ -296,15 +329,15 @@
 }
 
 .chip:hover {
-	border-color: var(--brand);
+	border-color: var(--ink-2);
 	color: var(--ink);
 }
 
 .chip[aria-pressed='true'] {
-	background: var(--brand-soft);
-	border-color: var(--brand);
+	background: var(--accent-soft);
+	border-color: var(--accent);
 	color: var(--brand);
-	font-weight: 500;
+	font-weight: 600;
 }
 
 .chips-empty {
@@ -312,7 +345,7 @@
 	color: var(--muted);
 }
 
-/* --------------------------------------------------------------- lista de filamentos */
+/* ------------------------------------------------------- lista de filamentos */
 
 .filament-head,
 .filament-row {
@@ -331,7 +364,6 @@
 .filament-row {
 	padding: var(--space-1);
 	border-radius: var(--radius-xs);
-	transition: background var(--dur-1) var(--ease-standard);
 }
 
 .filament-row:hover {
@@ -346,33 +378,38 @@
 .filament-row .btn-icon {
 	width: 2.25rem;
 	height: 2.25rem;
-	padding: 0;
+	border-color: transparent;
 }
 
-/* ---------------------------------------------------------------------- resultado */
+.filament-row:hover .btn-icon {
+	border-color: var(--border);
+}
+
+/* ------------------------------------------------------------- painel de preço */
 
 .result {
-	position: relative;
 	display: flex;
 	flex-direction: column;
-	gap: var(--space-4);
-	padding: var(--space-5);
-	background: var(--surface-2);
-	border: 1px solid var(--border);
+	gap: var(--space-5);
+	padding: var(--space-6);
+	background: var(--result-bg);
 	border-radius: var(--radius-lg);
+	color: var(--result-ink);
 }
 
 .result-label {
 	font-size: var(--text-sm);
-	color: var(--ink-2);
+	font-weight: 500;
+	color: var(--result-muted);
 }
 
 .result-value {
+	margin-top: var(--space-1);
 	font-family: var(--font-display);
-	font-size: var(--text-3xl);
+	font-size: var(--text-price);
 	font-weight: 600;
-	letter-spacing: -0.03em;
-	line-height: var(--leading-tight);
+	letter-spacing: -0.035em;
+	line-height: 1;
 	font-variant-numeric: tabular-nums;
 }
 
@@ -382,11 +419,31 @@
 	gap: var(--space-2);
 }
 
-/* Aparece só enquanto o preço está sendo recalculado — evita "pulo" do número. */
+.result .btn {
+	background: transparent;
+	border-color: var(--result-line);
+	color: var(--result-ink);
+}
+
+.result .btn:hover {
+	background: var(--result-hover);
+	border-color: var(--result-ink);
+}
+
+.result .card-note {
+	color: var(--result-muted);
+	text-align: left;
+}
+
+.result .card-note a {
+	color: var(--result-link);
+	font-weight: 600;
+}
+
 @keyframes result-in {
 	from {
 		opacity: 0;
-		transform: translateY(4px);
+		transform: translateY(6px);
 	}
 	to {
 		opacity: 1;
@@ -403,48 +460,41 @@
 .empty {
 	display: flex;
 	flex-direction: column;
-	gap: var(--space-3);
+	gap: var(--space-4);
 	font-size: var(--text-sm);
 	color: var(--ink-2);
 }
 
 .empty-title {
 	font-family: var(--font-display);
-	font-size: var(--text-base);
+	font-size: var(--text-lg);
 	font-weight: 600;
 	color: var(--ink);
+}
+
+.empty p {
+	max-width: 46ch;
 }
 
 .empty-list {
 	display: flex;
 	flex-direction: column;
-	gap: var(--space-2);
+	gap: var(--space-3);
+	padding-top: var(--space-1);
 }
 
 .empty-list li {
 	display: grid;
 	grid-template-columns: 5.5rem minmax(0, 1fr);
 	gap: var(--space-3);
-	font-size: var(--text-sm);
 }
 
-.empty-list dt,
 .empty-list .term {
 	color: var(--muted);
 }
 
-code {
-	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-	font-size: 0.9em;
-	padding: 2px 6px;
-	background: var(--surface-3);
-	border-radius: 6px;
-	color: var(--ink);
-}
-
 /* --------------------------------------------------------------------- histórico */
 
-/* O painel é o próprio <dialog>: Esc, foco preso e backdrop saem de graça. */
 .sheet {
 	position: fixed;
 	inset: 0 0 0 auto;
@@ -458,13 +508,13 @@ code {
 	border-left: 1px solid var(--border);
 	border-radius: 0;
 	background: var(--surface-1);
-	color: inherit;
+	color: var(--ink);
 	box-shadow: var(--shadow-float);
 	overflow-y: auto;
 }
 
 .sheet::backdrop {
-	background: rgb(11 15 18 / 0.45);
+	background: rgb(10 17 22 / 0.5);
 }
 
 .sheet-inner {
@@ -505,14 +555,14 @@ code {
 	display: flex;
 	flex-direction: column;
 	gap: 2px;
-	padding: var(--space-3);
+	padding: var(--space-3) var(--space-4);
 	background: var(--surface-2);
 	border-radius: var(--radius-xs);
 }
 
 .history-price {
 	font-family: var(--font-display);
-	font-size: var(--text-base);
+	font-size: var(--text-lg);
 	font-weight: 600;
 	font-variant-numeric: tabular-nums;
 }
@@ -532,6 +582,7 @@ code {
 	display: flex;
 	align-items: center;
 	gap: var(--space-2);
+	max-width: calc(100% - var(--space-6));
 	padding: var(--space-3) var(--space-5);
 	background: var(--ink);
 	color: var(--bg);
@@ -547,7 +598,7 @@ code {
 .link-box {
 	display: flex;
 	flex-direction: column;
-	gap: var(--space-2);
+	gap: var(--space-3);
 }
 
 .qr-slot {
@@ -571,7 +622,7 @@ code {
 }
 
 .note {
-	padding: var(--space-3) var(--space-4);
+	padding: var(--space-4);
 	background: var(--surface-2);
 	border-radius: var(--radius-xs);
 	font-size: var(--text-xs);

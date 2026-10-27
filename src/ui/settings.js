@@ -5,17 +5,26 @@
  */
 
 import { EVENTS, STORAGE_KEYS } from '../core/constants.js';
-import { CONFIG_FIELDS, DEFAULT_FILAMENT } from '../core/config.js';
+import { CONFIG_FIELDS, DEFAULT_FILAMENT, readConfigField } from '../core/config.js';
 import { state } from '../core/state.js';
 import * as storage from '../core/storage.js';
 import { formatBRL } from '../core/format.js';
 import { emit, on } from '../core/bus.js';
+import { createCombobox } from './combobox.js';
+
+/** Valor usado quando o usuário prefere digitar o número na mão. */
+const MANUAL = 'outros';
+
+const SELECT_FIELDS = ['selEst', 'selImp'];
+
+/** @type {Record<string, ReturnType<typeof createCombobox>>} */
+const combos = {};
 
 /**
  * @param {string} id
- * @returns {HTMLInputElement | HTMLSelectElement | null}
+ * @returns {any}
  */
-const field = (id) => /** @type {any} */ (document.getElementById(id));
+const field = (id) => document.getElementById(id);
 
 /**
  * @param {string} id
@@ -26,31 +35,84 @@ function setFieldValue(id, value) {
 	if (element) element.value = value;
 }
 
-/** Preenche os seletores com as tabelas carregadas dos JSON. */
-export function populateSelects() {
-	const stateSelect = field('selEst');
-	if (stateSelect) {
-		for (const item of Object.values(state.energy)) {
-			stateSelect.append(new Option(`${item.name} (${formatBRL(item.value)})`, String(item.value)));
+/** @returns {import('./combobox.js').ComboOption[]} */
+function energyOptions() {
+	const options = Object.entries(state.energy).map(([key, item]) => ({
+		value: key,
+		label: item.name,
+		group: formatBRL(item.value),
+	}));
+
+	return [{ value: MANUAL, label: 'Manual', group: '' }, ...options];
+}
+
+/** @returns {import('./combobox.js').ComboOption[]} */
+function printerOptions() {
+	const options = [{ value: MANUAL, label: 'Personalizado', group: '' }];
+
+	for (const [brand, models] of Object.entries(state.printers)) {
+		for (const printer of models) {
+			options.push({
+				value: `${brand}|${printer.model}`,
+				label: `${brand} · ${printer.model}`,
+				group: `${Math.round(printer.watts * 1000)} W`,
+			});
 		}
 	}
 
-	const printerSelect = field('selImp');
-	if (printerSelect) {
-		for (const [brand, models] of Object.entries(state.printers)) {
-			const group = document.createElement('optgroup');
-			group.label = brand;
-			for (const printer of models) {
-				group.append(new Option(`${printer.model} (${Math.round(printer.watts * 1000)} W)`, String(printer.watts)));
-			}
-			printerSelect.append(group);
-		}
+	return options;
+}
+
+/**
+ * @param {string} value
+ * @returns {{watts: number, model: string, brand: string} | null}
+ */
+function findPrinter(value) {
+	const [brand, model] = String(value).split('|');
+	if (!brand || !model) return null;
+	const found = (state.printers[brand] ?? []).find((printer) => printer.model === model);
+	return found ? { ...found, brand } : null;
+}
+
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+function normalizeEnergyKey(value) {
+	if (!value || value === MANUAL) return MANUAL;
+	if (state.energy[value]) return value;
+
+	const found = Object.entries(state.energy).find(([, item]) => String(item.value) === String(value));
+	return found ? found[0] : MANUAL;
+}
+
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+function normalizePrinterKey(value) {
+	if (!value || value === MANUAL) return MANUAL;
+	if (String(value).includes('|')) return value;
+
+	for (const [brand, models] of Object.entries(state.printers)) {
+		const found = models.find((printer) => String(printer.watts) === String(value));
+		if (found) return `${brand}|${found.model}`;
 	}
+
+	return MANUAL;
 }
 
 /** Leva a configuração do estado para os campos da tela. */
 export function applyConfigToDom() {
-	for (const id of CONFIG_FIELDS) setFieldValue(id, state.config[id]);
+	for (const id of CONFIG_FIELDS) {
+		if (SELECT_FIELDS.includes(id)) continue;
+		setFieldValue(id, state.config[id]);
+	}
+
+	state.config.selEst = normalizeEnergyKey(state.config.selEst);
+	state.config.selImp = normalizePrinterKey(state.config.selImp);
+	combos.selEst?.setValue(state.config.selEst);
+	combos.selImp?.setValue(state.config.selImp);
 }
 
 /** Grava configuração e filamentos de uma vez só. */
@@ -77,8 +139,8 @@ export function applyStoredSettings() {
 	if (Array.isArray(saved.filaments)) state.filaments = saved.filaments;
 
 	for (const id of CONFIG_FIELDS) {
-		const value = saved[id];
-		if (value !== undefined && value !== null) state.config[id] = String(value);
+		const value = readConfigField(saved, id);
+		if (value !== undefined) state.config[id] = String(value);
 	}
 
 	return true;
@@ -105,8 +167,36 @@ export function applySnapshot(data) {
 	}
 
 	for (const id of CONFIG_FIELDS) {
-		if (data[id] !== undefined && data[id] !== null) state.config[id] = String(data[id]);
+		const value = readConfigField(data, id);
+		if (value !== undefined) state.config[id] = String(value);
 	}
+}
+
+/**
+ * @param {string} id
+ * @param {string} value
+ */
+function applyFieldValue(id, value) {
+	state.config[id] = value;
+
+	if (id === 'selEst' && value !== MANUAL) {
+		const price = state.energy[value]?.value;
+		if (price !== undefined) {
+			state.config.energyKwh = String(price);
+			setFieldValue('energyKwh', String(price));
+		}
+	}
+
+	if (id === 'selImp' && value !== MANUAL) {
+		const printer = findPrinter(value);
+		if (printer) {
+			state.config.consumoKw = String(printer.watts);
+			setFieldValue('consumoKw', String(printer.watts));
+		}
+	}
+
+	saveSettings();
+	emit(EVENTS.CONFIG_CHANGED);
 }
 
 /**
@@ -117,27 +207,21 @@ function onInput(event) {
 	const id = target?.id;
 	if (!id || !CONFIG_FIELDS.includes(id)) return;
 
-	state.config[id] = target.value;
+	if (SELECT_FIELDS.includes(id)) return;
 
-	// Escolher estado ou impressora preenche o número correspondente, mas
-	// continua sendo possível ajustar o valor na mão depois.
-	if (id === 'selEst' && target.value !== 'outros') {
-		state.config.energyKwh = target.value;
-		setFieldValue('energyKwh', target.value);
-	}
+	applyFieldValue(id, target.value);
+}
 
-	if (id === 'selImp' && target.value !== 'outros') {
-		state.config.consumoKw = target.value;
-		setFieldValue('consumoKw', target.value);
-	}
-
-	saveSettings();
-	emit(EVENTS.CONFIG_CHANGED);
+export function hydrate() {
+	applyStoredSettings();
 }
 
 export function initSettings() {
-	populateSelects();
 	applyStoredSettings();
+
+	combos.selEst = createCombobox('selEst', energyOptions(), (value) => applyFieldValue('selEst', value));
+	combos.selImp = createCombobox('selImp', printerOptions(), (value) => applyFieldValue('selImp', value));
+
 	applyConfigToDom();
 
 	document.getElementById('panel-settings')?.addEventListener('input', onInput);
