@@ -7,9 +7,12 @@ const App = {
     clientModeKey: 'calc3d_client_mode',
     historyKey: 'calc3d_history',
     presetsKey: 'calc3d_presets',
-    configFields: ['energyKwh', 'consumoKw', 'margin', 'machineCost', 'hourRate', 'selEst', 'selImp'],
+    configFields: ['energyKwh', 'consumoKw', 'margin', 'machineCost', 'hourRate', 'selEst', 'selImp', 'failureRate', 'postProcessing'],
     filaments: [],
     selectedFilaments: new Set(),
+    clientMode: false,
+    history: [],
+    presets: {},
     clientMode: false,
     history: [],
     presets: {},
@@ -172,6 +175,7 @@ const App = {
             }
         }
 
+        // Parâmetros diretos na URL para alterar valores do simulador
         const quantityParam = params.get('q');
         if (quantityParam !== null) {
             const qtyInput = document.getElementById('quantity');
@@ -223,7 +227,13 @@ const App = {
         const energy = parseFloat(document.getElementById('consumoKw').value) * h * parseFloat(document.getElementById('energyKwh').value);
         const setupCost = parseFloat(document.getElementById('machineCost').value) || 0;
         const machineUsage = h * (parseFloat(document.getElementById('hourRate').value) || 0);
-        const total = (filament + energy + setupCost + machineUsage) * parseFloat(document.getElementById('margin').value);
+        const postProcessing = (parseFloat(document.getElementById('postProcessing')?.value) || 0) * qty;
+        let subtotal = filament + energy + setupCost + machineUsage + postProcessing;
+        const failureRate = parseFloat(document.getElementById('failureRate')?.value) || 0;
+        if (failureRate > 0) {
+            subtotal = subtotal * (1 + failureRate / 100);
+        }
+        const total = subtotal * parseFloat(document.getElementById('margin').value);
 
         document.getElementById('instruction').classList.add('hidden');
         document.getElementById('resultBox').classList.remove('hidden');
@@ -234,6 +244,7 @@ const App = {
         if (!val) return 0;
         const clean = String(val).toLowerCase().replace(',', '.').trim();
 
+        // Suporte para formato HH:MM (ex: 1:10 = 1 hora 10 minutos)
         if (type === 't' && clean.includes(':')) {
             const parts = clean.split(':');
             if (parts.length === 2) {
