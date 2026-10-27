@@ -153,6 +153,25 @@ const App = {
                 console.error("Erro decode URL");
             }
         }
+
+        // Parâmetros diretos na URL para alterar valores do simulador
+        const quantityParam = params.get('q');
+        if (quantityParam !== null) {
+            const qtyInput = document.getElementById('quantity');
+            if (qtyInput) qtyInput.value = quantityParam;
+        }
+
+        const weightParam = params.get('w');
+        if (weightParam !== null) {
+            const weightInput = document.getElementById('weight');
+            if (weightInput) weightInput.value = weightParam;
+        }
+
+        const timeParam = params.get('t');
+        if (timeParam !== null) {
+            const timeInput = document.getElementById('minutes');
+            if (timeInput) timeInput.value = timeParam;
+        }
     },
 
     generateLink() {
@@ -195,7 +214,21 @@ const App = {
     },
 
     parseUnit(val, type) {
-        const clean = val.toLowerCase().replace(',', '.');
+        if (!val) return 0;
+        const clean = String(val).toLowerCase().replace(',', '.').trim();
+
+        // Suporte para formato HH:MM (ex: 1:10 = 1 hora 10 minutos)
+        if (type === 't' && clean.includes(':')) {
+            const parts = clean.split(':');
+            if (parts.length === 2) {
+                const horas = parseFloat(parts[0]) || 0;
+                const minutos = parseFloat(parts[1]) || 0;
+                if (!isNaN(horas) && !isNaN(minutos)) {
+                    return horas * 60 + minutos;
+                }
+            }
+        }
+
         const num = parseFloat(clean);
         if (isNaN(num)) return 0;
         if (type === 'w') return clean.includes('kg') ? num * 1000 : num;
