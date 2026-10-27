@@ -3,7 +3,7 @@ const App = {
     printerData: {},
     storageKey: 'calc3d_settings_v2',
     panelStateKey: 'calc3d_panel_open',
-    configFields: ['energyKwh', 'consumoKw', 'margin', 'machineCost', 'hourRate', 'selEst', 'selImp'],
+    configFields: ['energyKwh', 'consumoKw', 'margin', 'machineCost', 'hourRate', 'selEst', 'selImp', 'failureRate', 'postProcessing'],
     filaments: [],
     selectedFilaments: new Set(),
 
@@ -206,7 +206,13 @@ const App = {
         const energy = parseFloat(document.getElementById('consumoKw').value) * h * parseFloat(document.getElementById('energyKwh').value);
         const setupCost = parseFloat(document.getElementById('machineCost').value) || 0;
         const machineUsage = h * (parseFloat(document.getElementById('hourRate').value) || 0);
-        const total = (filament + energy + setupCost + machineUsage) * parseFloat(document.getElementById('margin').value);
+        const postProcessing = (parseFloat(document.getElementById('postProcessing')?.value) || 0) * qty;
+        let subtotal = filament + energy + setupCost + machineUsage + postProcessing;
+        const failureRate = parseFloat(document.getElementById('failureRate')?.value) || 0;
+        if (failureRate > 0) {
+            subtotal = subtotal * (1 + failureRate / 100);
+        }
+        const total = subtotal * parseFloat(document.getElementById('margin').value);
 
         document.getElementById('instruction').classList.add('hidden');
         document.getElementById('resultBox').classList.remove('hidden');
