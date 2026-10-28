@@ -15,20 +15,20 @@
 	--brand-900: #10557a;
 
 	/* ------------------------------------------------------------------ superfícies */
-	--bg: #eef3f5;
+	--bg: #eef2f5;
 	--surface-1: #ffffff;
-	--surface-2: #f4f8fa;
-	--surface-3: #e3eaef;
-	--border: #d5dfe5;
-	--border-strong: #6f7d89;
+	--surface-2: #f7fafc;
+	--surface-3: #e9eef2;
+	--border: #dde5ea;
+	--border-strong: #7a8994;
 
 	/* ----------------------------------------------------------------------- tinta */
-	--ink: #0a1116;
-	--ink-2: #33414a;
-	--muted: #55646e;
+	--ink: #16222b;
+	--ink-2: #46555f;
+	--muted: #5c6b75;
 
 	/* ----------------------------------------------------------------------- marca */
-	--brand: #0f6f96;
+	--brand: #0e6e93;
 	--brand-ink: #ffffff;
 	--accent: #3fc2de;
 	--accent-hover: #2fb0cd;
@@ -36,12 +36,12 @@
 	--accent-soft: #d9f1f8;
 
 	/* -------------------------------------------------------- painel de preço */
-	--result-bg: #0c161c;
-	--result-ink: #f2f9fb;
-	--result-muted: #a9c2cd;
-	--result-link: #6fdcea;
-	--result-line: rgb(255 255 255 / 0.24);
-	--result-hover: rgb(255 255 255 / 0.1);
+	--result-bg: #ffffff;
+	--result-ink: #16222b;
+	--result-muted: #64737d;
+	--result-link: #0e6e93;
+	--result-line: #cdd9e0;
+	--result-hover: #e9eef2;
 
 	/* --------------------------------------------------------------------- estados */
 	--danger: #a8231a;
@@ -91,9 +91,9 @@
 	--ease-out-back: cubic-bezier(0.16, 1, 0.3, 1);
 
 	/* ---------------------------------------------------------------------- efeitos */
-	--ring: 0 0 0 3px rgb(15 111 150 / 0.28);
-	--shadow-soft: 0 1px 2px rgb(10 17 22 / 0.06);
-	--shadow-float: 0 18px 44px rgb(10 17 22 / 0.18);
+	--ring: 0 0 0 3px rgb(15 111 150 / 0.25);
+	--shadow-soft: 0 1px 2px rgb(10 17 22 / 0.05);
+	--shadow-float: 0 18px 44px rgb(10 17 22 / 0.14);
 }
 
 [data-theme='dark'] {
