@@ -8,7 +8,7 @@ const BASE_URL = process.env.QA_BASE_URL ?? 'http://127.0.0.1:8000';
 
 export default defineConfig({
 	testDir: 'qa/tests',
-	outputDir: 'qa/.artifacts',
+	outputDir: 'qa/.artifacts/run',
 	fullyParallel: true,
 	forbidOnly: Boolean(process.env.CI),
 	retries: process.env.CI ? 1 : 0,

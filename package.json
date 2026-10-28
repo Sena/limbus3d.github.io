@@ -6,7 +6,7 @@
   "description": "Calculadora de preços para impressão 3D — FDM, com configuração de filamentos, energia e máquina.",
   "scripts": {
     "dev": "node scripts/serve.mjs 8000",
-    "test": "node --test \"tests/**/*.test.js\"",
+    "test": "node --test",
     "test:e2e": "playwright test"
   },
   "engines": {
