@@ -74,7 +74,7 @@
 
 .input:hover,
 .textarea:hover {
-	border-color: var(--ink-2);
+	border-color: var(--muted);
 }
 
 .input:focus,

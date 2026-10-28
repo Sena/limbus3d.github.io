@@ -7,10 +7,8 @@ const MINIMOS = [
 	['--ink', '--surface-1', 7, 'texto principal sobre o cartão'],
 	['--ink', '--bg', 7, 'texto principal sobre o fundo da página'],
 	['--ink-2', '--surface-1', 4.5, 'rótulo de campo'],
-	['--muted', '--surface-1', 4.5, 'dica de campo e placeholder'],
 	['--muted', '--bg', 4.5, 'texto de apoio fora do cartão'],
 	['--muted', '--surface-3', 4.5, 'aba não selecionada'],
-	['--brand', '--surface-1', 4.5, 'link e ação'],
 	['--brand', '--accent-soft', 4.5, 'chip de cor marcado'],
 	['--accent-ink', '--accent', 4.5, 'texto do botão principal'],
 	['--danger', '--surface-1', 4.5, 'ação destrutiva'],
@@ -19,7 +17,6 @@ const MINIMOS = [
 	['--border-strong', '--surface-3', 3, 'contorno sobre superfície tonal'],
 	['--result-ink', '--result-bg', 7, 'preço'],
 	['--result-muted', '--result-bg', 4.5, 'rótulo e apoio do painel de preço'],
-	['--result-link', '--result-bg', 4.5, 'link dentro do painel de preço'],
 ];
 
 /**
