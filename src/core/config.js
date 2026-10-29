@@ -4,6 +4,9 @@
  * chega pela primeira vez informa peso e tempo e já recebe um preço.
  */
 
+/** Rota do minicommerce que resolve links de modelo/drop do STLFlix. */
+export const IMPORT_ENDPOINT = 'https://limbus.com.br/api/import';
+
 /** Campos que vivem na aba de configurações e são persistidos. */
 export const CONFIG_FIELDS = Object.freeze([
 	'energyKwh',

@@ -101,10 +101,24 @@
 					<div class="card">
 						<div class="card-head">
 							<h1 class="card-title">Dados da peça</h1>
-							<span class="card-note">Preenchido pelo fatiador</span>
+							<span class="card-note">Pelo fatiador ou por link</span>
 						</div>
 
 						<div class="stack">
+							<form class="import-strip" id="importForm" autocomplete="off" novalidate>
+								<div class="import-strip-head">
+									<span class="import-strip-title">Importar de um link</span>
+									<span class="import-strip-note">STLFlix</span>
+								</div>
+
+								<div class="import-strip-row">
+									<input class="input" type="url" id="importUrl" name="url" placeholder="https://platform.stlflix.com/..." autocomplete="off" spellcheck="false" aria-label="Link do modelo ou do drop no STLFlix">
+									<button class="btn" type="submit" id="importSubmit">Importar</button>
+								</div>
+
+								<span class="field-hint">Cole o link do modelo ou do drop. Peso e tempo vêm preenchidos.</span>
+							</form>
+
 							<div class="field">
 								<span class="field-label">Cores usadas nesta peça</span>
 								<div class="chips" id="colorChoices" role="group" aria-label="Filamentos usados nesta peça"></div>
@@ -387,6 +401,25 @@
 			<div class="history-list" id="historyList"></div>
 
 			<button type="button" class="btn btn-danger btn-block" id="historyClear">Limpar histórico</button>
+		</div>
+	</dialog>
+
+	<dialog class="sheet" id="importSheet" aria-labelledby="importTitle">
+		<div class="sheet-inner">
+			<div class="sheet-head">
+				<div class="sheet-heading">
+					<h2 class="card-title" id="importTitle">Escolha a versão</h2>
+					<p class="sheet-subtitle" id="importSubtitle"></p>
+					<p class="field-hint" id="importHint"></p>
+				</div>
+				<button type="button" class="btn btn-icon" id="importClose" aria-label="Fechar importação">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+						<path d="M6 6l12 12M18 6L6 18"></path>
+					</svg>
+				</button>
+			</div>
+
+			<div class="import-items" id="importItems"></div>
 		</div>
 	</dialog>
 

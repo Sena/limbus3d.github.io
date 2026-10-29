@@ -17,6 +17,7 @@ import * as settings from './ui/settings.js';
 import * as filaments from './ui/filaments.js';
 import * as presets from './ui/presets.js';
 import * as history from './ui/history.js';
+import * as importer from './ui/importer.js';
 import * as calculator from './ui/calculator.js';
 import * as share from './ui/share.js';
 import * as exports from './ui/export.js';
@@ -121,6 +122,7 @@ function markSettingsSeen() {
 	history.initHistory();
 
 	calculator.initCalculator();
+	importer.initImporter();
 	share.initShare();
 	exports.initExport();
 
