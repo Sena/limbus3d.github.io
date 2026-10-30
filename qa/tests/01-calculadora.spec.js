@@ -24,24 +24,26 @@ test('a quantidade multiplica a peça, mas o setup entra uma vez por lote', asyn
 	await expect(page.locator('#finalPrice')).toHaveText(PRECO_TRES_PECAS);
 });
 
-test('o modo cliente esconde as abas de configuração', async ({ page }) => {
+test('as três abas ficam sempre visíveis e não existe modo cliente', async ({ page }) => {
 	await page.goto('/');
-	const abas = page.locator('.tabs');
 
-	await expect(abas).toBeVisible();
-	await page.locator('#clientToggle').click();
-	await expect(abas).toBeHidden();
-	await expect(page.locator('#clientToggle')).toHaveAttribute('aria-checked', 'true');
+	await expect(page.locator('.tab')).toHaveCount(3);
+	await expect(page.locator('#tab-calc')).toHaveAttribute('aria-selected', 'true');
+	await expect(page.locator('#clientToggle')).toHaveCount(0);
 
-	await page.reload();
-	await expect(abas).toBeHidden();
+	await page.locator('#tab-batch').click();
+	await expect(page.locator('#panel-batch')).toBeVisible();
+	await expect(page.locator('#panel-calc')).toBeHidden();
+
+	await page.locator('#tab-settings').click();
+	await expect(page.locator('#panel-settings')).toBeVisible();
+	await expect(page.locator('.tabs')).toBeVisible();
 });
 
-test('abre pronto, sem se mexer, com tema e modo salvos', async ({ page }) => {
+test('abre pronto, sem se mexer, com tema e aba salvos', async ({ page }) => {
 	await page.addInitScript(() => {
 		try {
 			localStorage.setItem('calc3d_theme', 'dark');
-			localStorage.setItem('calc3d_client_mode', 'true');
 			localStorage.setItem('calc3d_tab', 'settings');
 		} catch {
 		}
@@ -57,7 +59,7 @@ test('abre pronto, sem se mexer, com tema e modo salvos', async ({ page }) => {
 	await page.goto('/');
 
 	await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-	await expect(page.locator('.tabs')).toBeHidden();
+	await expect(page.locator('#panel-settings')).toBeVisible();
 
 	await page.waitForTimeout(700);
 	expect(await page.evaluate(() => window.__deslocamento)).toBeLessThan(0.01);

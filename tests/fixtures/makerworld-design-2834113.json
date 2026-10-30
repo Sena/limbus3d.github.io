@@ -1,0 +1,70 @@
+{
+	"source": "makerworld",
+	"kind": "model",
+	"title": "Alien with a raised eyebrow (7 grams)",
+	"url": "https://makerworld.com/pt/models/2834113-alien-with-a-raised-eyebrow-7-grams",
+	"selectedProfileId": "3639209",
+	"profiles": [
+		{
+			"id": "3158330",
+			"title": "Alien (completely green/single-color)",
+			"cover": "https://makerworld.bblmw.com/makerworld/model/USad5759ad53175/778423774/instance/5aee503b814303df.jpg",
+			"weightG": 7,
+			"minutes": 35,
+			"needAms": false,
+			"colorCount": 1,
+			"plates": [
+				{
+					"index": 1,
+					"title": "Prato 1",
+					"weightG": 7,
+					"minutes": 35,
+					"thumbnail": "https://makerworld.bblmw.com/makerworld/model/USad5759ad53175/778423774/instance/plate_1.png"
+				}
+			]
+		},
+		{
+			"id": "3158469",
+			"title": "Alien (Dual-Color)",
+			"cover": "https://makerworld.bblmw.com/makerworld/model/USad5759ad53175/778461826/instance/5aee503b814303df.jpg",
+			"weightG": 36,
+			"minutes": 133,
+			"needAms": true,
+			"colorCount": 2,
+			"plates": [
+				{
+					"index": 1,
+					"title": "Prato 1",
+					"weightG": 36,
+					"minutes": 133,
+					"thumbnail": "https://makerworld.bblmw.com/makerworld/model/USad5759ad53175/778461826/instance/plate_1.png"
+				}
+			]
+		},
+		{
+			"id": "3639209",
+			"title": "Multipart - 0.2mm layer, 2 walls, 8% infill",
+			"cover": "https://makerworld.bblmw.com/makerworld/model/USad5759ad53175/955200099/instance/5aee503b814303df.jpg",
+			"weightG": 9,
+			"minutes": 62,
+			"needAms": false,
+			"colorCount": 2,
+			"plates": [
+				{
+					"index": 1,
+					"title": "Prato 1",
+					"weightG": 8,
+					"minutes": 52,
+					"thumbnail": "https://makerworld.bblmw.com/makerworld/model/USad5759ad53175/955200099/instance/plate_1.png"
+				},
+				{
+					"index": 2,
+					"title": "Prato 2",
+					"weightG": 1,
+					"minutes": 10,
+					"thumbnail": "https://makerworld.bblmw.com/makerworld/model/USad5759ad53175/955200099/instance/plate_2.png"
+				}
+			]
+		}
+	]
+}

@@ -33,7 +33,7 @@
 	font-size: var(--text-2xl);
 	font-weight: 600;
 	letter-spacing: -0.035em;
-	color: var(--ink);
+	color: var(--brand);
 }
 
 .brand-sub {
@@ -54,6 +54,7 @@
 	gap: var(--space-1);
 	padding: var(--space-1);
 	background: var(--surface-3);
+	border: 1px solid var(--border);
 	border-radius: var(--radius);
 }
 
@@ -84,6 +85,7 @@
 	border-color: var(--border);
 	color: var(--ink);
 	font-weight: 600;
+	box-shadow: var(--shadow-soft);
 }
 
 /* Ponto discreto: convida a olhar as configurações uma vez, sem pular na tela. */
@@ -100,9 +102,12 @@
 	visibility: hidden;
 }
 
+html[data-tab='calc'] #panel-batch,
 html[data-tab='calc'] #panel-settings,
+html[data-tab='orcamento'] #panel-calc,
+html[data-tab='orcamento'] #panel-settings,
 html[data-tab='settings'] #panel-calc,
-html[data-client='on'] .tabs {
+html[data-tab='settings'] #panel-batch {
 	display: none;
 }
 
@@ -229,5 +234,14 @@ html[data-client='on'] .tabs {
 	.header-actions {
 		width: 100%;
 		justify-content: space-between;
+	}
+
+	.tabs {
+		gap: 2px;
+	}
+
+	.tab {
+		padding: var(--space-3) var(--space-2);
+		font-size: var(--text-xs);
 	}
 }

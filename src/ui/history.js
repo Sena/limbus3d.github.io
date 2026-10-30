@@ -80,7 +80,7 @@ export function renderHistory() {
 		meta.className = 'history-meta';
 		meta.textContent = [
 			formatDateTime(entry.createdAt),
-			`${entry.quantity} un`,
+			entry.itemsCount > 0 ? `${entry.itemsCount} itens` : `${entry.quantity} un`,
 			formatWeight(entry.weightGrams),
 			formatDuration(entry.minutes),
 		].join(' · ');
@@ -88,6 +88,42 @@ export function renderHistory() {
 		item.append(price, meta);
 		container.append(item);
 	}
+}
+
+/** Guarda o orçamento de vários itens, com a quebra por prato. */
+export function saveBatch() {
+	const result = state.batch.result;
+
+	if (!result) {
+		toast('Monte um orçamento antes de salvar.');
+		return;
+	}
+
+	const items = result.items.map((line) => ({
+		title: line.title,
+		weightGrams: line.weightG,
+		minutes: line.minutes,
+		total: Math.round(line.quote.total * 100) / 100,
+	}));
+
+	state.history.unshift({
+		id: Date.now(),
+		createdAt: new Date().toISOString(),
+		quantity: result.quantity,
+		weightGrams: result.weightGrams,
+		minutes: result.minutes,
+		total: result.total,
+		itemsCount: items.length,
+		source: state.batch.source,
+		items,
+		subtotal: result.subtotal,
+		discount: result.discount,
+	});
+
+	state.history = state.history.slice(0, MAX_HISTORY);
+	persistHistory();
+	renderHistory();
+	toast('Orçamento salvo no histórico.');
 }
 
 /** Guarda o cálculo que está na tela. */

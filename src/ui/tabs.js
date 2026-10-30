@@ -1,5 +1,5 @@
 /**
- * tabs.js — navegação entre Calculadora e Configurações.
+ * tabs.js — navegação entre Calculadora, Orçamento e Configurações.
  * A aba aberta fica salva, então quem volta ao site cai onde parou.
  */
 
@@ -9,20 +9,24 @@ import { emit } from '../core/bus.js';
 
 const TAB_IDS = {
 	[TABS.CALC]: 'tab-calc',
+	[TABS.BATCH]: 'tab-batch',
 	[TABS.SETTINGS]: 'tab-settings',
 };
 
 const PANEL_IDS = {
 	[TABS.CALC]: 'panel-calc',
+	[TABS.BATCH]: 'panel-batch',
 	[TABS.SETTINGS]: 'panel-settings',
 };
 
 /**
  * @param {unknown} value
- * @returns {'calc'|'settings'}
+ * @returns {'calc'|'orcamento'|'settings'}
  */
 function normalize(value) {
-	return value === TABS.SETTINGS ? TABS.SETTINGS : TABS.CALC;
+	if (value === TABS.SETTINGS) return TABS.SETTINGS;
+	if (value === TABS.BATCH) return TABS.BATCH;
+	return TABS.CALC;
 }
 
 /**

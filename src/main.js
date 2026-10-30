@@ -17,7 +17,8 @@ import * as settings from './ui/settings.js';
 import * as filaments from './ui/filaments.js';
 import * as presets from './ui/presets.js';
 import * as history from './ui/history.js';
-import * as importer from './ui/importer.js';
+import * as importSheet from './ui/import-sheet.js';
+import * as batch from './ui/batch.js';
 import * as calculator from './ui/calculator.js';
 import * as share from './ui/share.js';
 import * as exports from './ui/export.js';
@@ -65,30 +66,6 @@ function applyUrlInputs() {
 	if (minutes && input.time !== null) minutes.value = input.time;
 }
 
-/** Modo cliente esconde as configurações internas de custo. */
-function applyClientMode() {
-	const toggle = document.getElementById('clientToggle');
-	toggle?.setAttribute('aria-checked', String(state.clientMode));
-
-	const nav = document.querySelector('.tabs');
-	if (nav instanceof HTMLElement) nav.hidden = state.clientMode;
-
-	if (state.clientMode) {
-		document.documentElement.dataset.client = 'on';
-		tabs.switchTab(TABS.CALC);
-	} else {
-		document.documentElement.removeAttribute('data-client');
-	}
-}
-
-function toggleClientMode() {
-	state.clientMode = !state.clientMode;
-	storage.write(STORAGE_KEYS.clientMode, String(state.clientMode));
-	applyClientMode();
-	calculator.recalculate();
-	emit(EVENTS.CLIENT_MODE_CHANGED, { enabled: state.clientMode });
-}
-
 /** O ponto na aba some assim que o usuário olha as configurações uma vez. */
 function updateSettingsDot() {
 	const dot = document.getElementById('settingsDot');
@@ -101,14 +78,14 @@ function markSettingsSeen() {
 	storage.write(STORAGE_KEYS.settingsSeen, 'true');
 	updateSettingsDot();
 	calculator.recalculate();
-}async function init() {
-	state.clientMode = storage.read(STORAGE_KEYS.clientMode, 'false') === 'true';
+}
+
+async function init() {
 	state.settingsSeen = storage.read(STORAGE_KEYS.settingsSeen, 'false') === 'true';
 
 	theme.initTheme();
 
 	tabs.initTabs();
-	applyClientMode();
 	updateSettingsDot();
 
 	settings.hydrate();
@@ -122,7 +99,8 @@ function markSettingsSeen() {
 	history.initHistory();
 
 	calculator.initCalculator();
-	importer.initImporter();
+	importSheet.initImportSheet();
+	batch.initBatch();
 	share.initShare();
 	exports.initExport();
 
@@ -131,7 +109,6 @@ function markSettingsSeen() {
 		if (tab === TABS.SETTINGS) markSettingsSeen();
 	});
 
-	document.getElementById('clientToggle')?.addEventListener('click', toggleClientMode);
 	document.getElementById('refineLink')?.addEventListener('click', (event) => {
 		event.preventDefault();
 		tabs.switchTab(TABS.SETTINGS);

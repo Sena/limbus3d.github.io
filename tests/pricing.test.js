@@ -137,3 +137,33 @@ test('tempo em horas é convertido a partir dos minutos', () => {
 	assert.equal(quote.hours, 1.5);
 	assert.equal(quote.machineCost, 3);
 });
+
+test('sem pieces, o pós-processamento segue a quantidade', () => {
+	const quote = calculateQuote(base({ quantity: 2, config: config({ postProcessing: '5' }) }));
+
+	assert.equal(quote.pieces, 2);
+	assert.equal(quote.postProcessingCost, 10);
+});
+
+test('pieces multiplica só o pós-processamento', () => {
+	const reference = calculateQuote(
+		base({ quantity: 2, config: config({ postProcessing: '3' }) }),
+	);
+	const quote = calculateQuote(
+		base({ quantity: 2, pieces: 4, config: config({ postProcessing: '3' }) }),
+	);
+
+	assert.equal(quote.pieces, 4);
+	assert.equal(quote.postProcessingCost, 12);
+	assert.equal(reference.postProcessingCost, 6);
+	assert.equal(quote.filamentCost, reference.filamentCost);
+	assert.equal(quote.machineCost, reference.machineCost);
+	// A diferença de R$ 6 de pós entra no custo e é multiplicada pelo markup 2.
+	assert.equal(quote.total - reference.total, 12);
+	assert.equal(quote.unitPrice, quote.total / 4);
+});
+
+test('pieces inválido cai na quantidade', () => {
+	const quote = calculateQuote(base({ quantity: 2, pieces: 0 }));
+	assert.equal(quote.pieces, 2);
+});

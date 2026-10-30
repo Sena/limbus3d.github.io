@@ -4,6 +4,7 @@
  */
 
 import { createDefaultConfig } from './config.js';
+import { createBatch } from './batch.js';
 
 export const state = {
 	/** Tarifas por estado, vindas de src/data/energy.json */
@@ -45,8 +46,12 @@ export const state = {
 	/** @type {Record<string, unknown>} */
 	presets: {},
 
-	/** Esconde as configurações internas de custo */
-	clientMode: false,
+	/**
+	 * Orçamento de vários itens, da aba Orçamento.
+	 * `result` é derivado de `items` + quantidade + filamentos + configuração.
+	 */
+	/** @type {ReturnType<typeof createBatch> & {lastResult?: any}} */
+	batch: createBatch(),
 
 	/** Se o usuário já abriu as configurações alguma vez */
 	settingsSeen: false,

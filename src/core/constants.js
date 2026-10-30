@@ -7,7 +7,6 @@
 export const STORAGE_KEYS = Object.freeze({
 	settings: 'calc3d_settings_v2',
 	theme: 'calc3d_theme',
-	clientMode: 'calc3d_client_mode',
 	history: 'calc3d_history',
 	presets: 'calc3d_presets',
 	tab: 'calc3d_tab',
@@ -16,6 +15,7 @@ export const STORAGE_KEYS = Object.freeze({
 
 export const TABS = Object.freeze({
 	CALC: 'calc',
+	BATCH: 'orcamento',
 	SETTINGS: 'settings',
 });
 
@@ -25,7 +25,7 @@ export const EVENTS = Object.freeze({
 	FILAMENTS_CHANGED: 'filaments:changed',
 	SELECTION_CHANGED: 'selection:changed',
 	TAB_CHANGED: 'tab:changed',
-	CLIENT_MODE_CHANGED: 'client:changed',
+	BATCH_CHANGED: 'batch:changed',
 });
 
 /** Histórico guarda no máximo esta quantidade de cálculos. */
