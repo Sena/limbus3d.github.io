@@ -31,8 +31,13 @@ No VS Code, a extensão **Live Server** em `index.html` também funciona.
 npm test             # node --test, sem dependências
 ```
 
-Os testes cobrem a leitura dos campos (`parser`), o cálculo (`pricing`), o link
-compartilhável (`url`) e a formatação (`format`).
+Os testes cobrem a leitura dos campos (`parser`), o cálculo (`pricing`), o
+orçamento de vários itens (`batch`), o link compartilhável (`url`), a formatação
+(`format`) e a importação de links (`importer`, `makerworld`).
+
+```bash
+npm run test:e2e     # Playwright, desktop e telefone
+```
 
 ## Como usar
 
@@ -47,6 +52,29 @@ compartilhável (`url`) e a formatação (`format`).
 **Cores usadas nesta peça** são os filamentos marcados. Com mais de um marcado,
 o cálculo usa o **mais caro por grama** entre eles, para não vender abaixo do
 custo em peça multicolor. Sem nenhum marcado, vale o primeiro filamento da lista.
+
+### Orçamento
+
+A aba **Orçamento** importa peso e tempo de links do **MakerWorld** e do
+**STLFlix**, no mesmo campo — o sistema identifica a fonte.
+
+No MakerWorld a pessoa escolhe **um perfil de impressão** e marca **quais
+pratos** entram no orçamento, com imagem, peso e tempo de cada um. No STLFlix,
+escolhe o modelo/drop e a versão, como antes.
+
+Cada item tem preço individual, como se fosse um orçamento sozinho. No fim, o
+lote é recalculado com peso e tempo somados e **um único setup**, e a diferença
+aparece como **desconto em lote**:
+
+| Linha | O que é |
+| --- | --- |
+| Subtotal | Soma dos preços individuais |
+| Desconto em lote | Subtotal − total com setup único (só com 2+ itens) |
+| Preço total | O valor do lote |
+
+A **quantidade** vale para todos os itens (cópias de cada prato) e as **cores**
+são as mesmas da Calculadora. O orçamento fica só na sessão: recarregar limpa a
+lista.
 
 ### Configurações
 
@@ -70,11 +98,6 @@ incomoda mais.
 preencher, pintar, polir. Informe o valor médio **por peça** e ele é
 multiplicado pela quantidade.
 
-### Modo cliente
-
-O interruptor no topo esconde a aba de configurações, para mostrar a tela sem
-os custos internos.
-
 ## Parâmetros na URL
 
 | Parâmetro | Campo | Exemplo |
@@ -91,7 +114,7 @@ https://calculadora.limbus.com.br/?q=3&w=50g&t=1:10
 ## Estrutura
 
 ```
-index.html                página única, com as duas abas
+index.html                página única, com as três abas
 src/
   main.js                 ponto de entrada: carrega dados e inicializa módulos
   core/                   regra de negócio, sem DOM (é o que os testes cobrem)
@@ -99,12 +122,18 @@ src/
     config.js             campos, valores padrão, filamento padrão
     parser.js             leitura de peso, tempo e quantidade
     pricing.js            cálculo do orçamento
+    importer.js           link externo vira peso e tempo (STLFlix e MakerWorld)
+    makerworld.js         link, perfis e pratos do MakerWorld
+    batch.js              orçamento de vários itens e desconto de lote
+    import-error.js       erro de importação com mensagem pronta
     url.js                link compartilhável e parâmetros de URL
     format.js             moeda, data, peso e duração em pt-BR
     storage.js            localStorage tolerante a falhas
     bus.js                barramento de eventos interno
     state.js              estado compartilhado
   ui/                     interface; cada arquivo cuida de um pedaço da tela
+    import-sheet.js       folha com perfis, pratos e versões
+    batch.js              aba Orçamento: lista, totais, histórico e PDF
   styles/
     tokens.css            cores, tipografia, espaços, movimento
     base.css              reset e estados de foco
@@ -120,6 +149,11 @@ Os módulos de `core` são funções puras: não conhecem o DOM e podem rodar em
 qualquer ambiente. Os módulos de `ui` conversam entre si pelo barramento de
 eventos (`bus.js`), e quem grava no `localStorage` é somente `ui/settings.js`,
 para não haver dois escritores no mesmo registro.
+
+A importação de links passa pela rota `GET /api/import?url=`, do repositório
+`mini-commerce`. Ela resolve o link no servidor (o navegador não consegue falar
+direto com STLFlix nem MakerWorld) e devolve peso e tempo já normalizados.
+`?refresh=1` rebusca ignorando o cache.
 
 ## Editando as tabelas
 

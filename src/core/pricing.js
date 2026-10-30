@@ -26,7 +26,8 @@
  * @typedef {Object} QuoteInput
  * @property {number} weightGrams
  * @property {number} minutes
- * @property {number} quantity
+ * @property {number} quantity cópias idênticas da peça
+ * @property {number} [pieces] peças para o pós-processamento; padrão: quantity
  * @property {Filament[]} filaments
  * @property {number[]} selected índices dos filamentos marcados
  * @property {QuoteConfig} config
@@ -78,6 +79,7 @@ export function feeRateOf(config) {
  *   total: number,
  *   unitPrice: number,
  *   quantity: number,
+ *   pieces: number,
  *   minutes: number,
  *   hours: number,
  *   weightGrams: number,
@@ -100,6 +102,9 @@ export function calculateQuote(input) {
 	const weightGrams = toNumber(input?.weightGrams);
 	const minutes = toNumber(input?.minutes);
 	const quantity = Math.max(1, Math.floor(toNumber(input?.quantity) || 1));
+	// Em um lote de vários itens o pós-processamento é cobrado por peça
+	// impressa, que não é o mesmo número de cópias de um item só.
+	const pieces = Math.max(1, Math.floor(toNumber(input?.pieces) || quantity));
 	const filaments = Array.isArray(input?.filaments) ? input.filaments : [];
 	const config = input?.config ?? {};
 
@@ -125,7 +130,7 @@ export function calculateQuote(input) {
 	const failureCost = failureRate > 0 ? failureBase * (failureRate / 100) : 0;
 
 	const setupCost = toNumber(config.machineCost);
-	const postProcessingCost = toNumber(config.postProcessing) * quantity;
+	const postProcessingCost = toNumber(config.postProcessing) * pieces;
 
 	const costTotal = failureBase + failureCost + setupCost + postProcessingCost;
 
@@ -138,8 +143,9 @@ export function calculateQuote(input) {
 
 	return {
 		total,
-		unitPrice: total / quantity,
+		unitPrice: total / (pieces || quantity),
 		quantity,
+		pieces,
 		minutes,
 		hours,
 		weightGrams,

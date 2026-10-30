@@ -52,7 +52,7 @@ function render(quote) {
 	}
 
 	const hint = amount('refineHint');
-	if (hint) hint.hidden = state.clientMode || state.settingsSeen;
+	if (hint) hint.hidden = state.settingsSeen;
 }
 
 export function recalculate() {

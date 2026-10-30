@@ -15,33 +15,34 @@
 	--brand-900: #10557a;
 
 	/* ------------------------------------------------------------------ superfícies */
-	--bg: #eef2f5;
+	--bg: #e6eff4;
+	--bg-glow: rgb(13 164 194 / 0.16);
 	--surface-1: #ffffff;
-	--surface-2: #f7fafc;
-	--surface-3: #e9eef2;
-	--border: #dde5ea;
-	--border-strong: #7a8994;
+	--surface-2: #f0f7fa;
+	--surface-3: #dbe8ee;
+	--border: #c3d5de;
+	--border-strong: #587180;
 
 	/* ----------------------------------------------------------------------- tinta */
-	--ink: #16222b;
-	--ink-2: #46555f;
-	--muted: #5c6b75;
+	--ink: #0c1b23;
+	--ink-2: #34464f;
+	--muted: #4e616c;
 
 	/* ----------------------------------------------------------------------- marca */
-	--brand: #0e6e93;
+	--brand: #0a5b78;
 	--brand-ink: #ffffff;
-	--accent: #3fc2de;
-	--accent-hover: #2fb0cd;
-	--accent-ink: #04222c;
-	--accent-soft: #d9f1f8;
+	--accent: #0da4c2;
+	--accent-hover: #0a8ba5;
+	--accent-ink: #03222b;
+	--accent-soft: #d7f1f8;
 
 	/* -------------------------------------------------------- painel de preço */
-	--result-bg: #ffffff;
-	--result-ink: #16222b;
-	--result-muted: #64737d;
-	--result-link: #0e6e93;
-	--result-line: #cdd9e0;
-	--result-hover: #e9eef2;
+	--result-bg: #e2f5fb;
+	--result-ink: #082b36;
+	--result-muted: #3c6270;
+	--result-link: #085a75;
+	--result-line: #a9d7e5;
+	--result-hover: #cdecf5;
 
 	/* --------------------------------------------------------------------- estados */
 	--danger: #a8231a;
@@ -91,8 +92,8 @@
 	--ease-out-back: cubic-bezier(0.16, 1, 0.3, 1);
 
 	/* ---------------------------------------------------------------------- efeitos */
-	--ring: 0 0 0 3px rgb(15 111 150 / 0.25);
-	--shadow-soft: 0 1px 2px rgb(10 17 22 / 0.05);
+	--ring: 0 0 0 3px rgb(13 164 194 / 0.28);
+	--shadow-soft: 0 1px 2px rgb(9 32 43 / 0.06), 0 1px 10px rgb(9 32 43 / 0.04);
 	--shadow-float: 0 18px 44px rgb(10 17 22 / 0.14);
 }
 
@@ -100,6 +101,7 @@
 	color-scheme: dark;
 
 	--bg: #0b0e11;
+	--bg-glow: rgb(69 210 227 / 0.10);
 	--surface-1: #12161a;
 	--surface-2: #191e24;
 	--surface-3: #222830;

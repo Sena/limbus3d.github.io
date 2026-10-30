@@ -10,6 +10,10 @@
  */
 
 import { IMPORT_ENDPOINT } from './config.js';
+import { ImportRequestError } from './import-error.js';
+import { hydrateMakerworldPayload, parseMakerworldLink } from './makerworld.js';
+
+export { ImportRequestError } from './import-error.js';
 
 const STLFLIX_HOST = 'platform.stlflix.com';
 
@@ -27,20 +31,19 @@ const WEIGHT_ENTRY_PATTERN =
 	/([\p{L}][\p{L}\s-]{0,30}?)\s*[-–—]\s*([\d.,]+)\s*(?:gramas?|grams?|g)\b/giu;
 
 /**
- * Erro que já vem com uma mensagem pronta para o toast.
+ * Diz de qual site é o link e devolve o alvo já validado.
+ * @param {unknown} raw
+ * @returns {{source: 'stlflix', target: NonNullable<ReturnType<typeof parseStlflixLink>>}
+ *   | {source: 'makerworld', target: NonNullable<ReturnType<typeof parseMakerworldLink>>} | null}
  */
-export class ImportRequestError extends Error {
-	/**
-	 * @param {string} code
-	 * @param {string} message
-	 * @param {number} [status]
-	 */
-	constructor(code, message, status = 0) {
-		super(message);
-		this.name = 'ImportRequestError';
-		this.code = code;
-		this.status = status;
-	}
+export function detectImportSource(raw) {
+	const stlflix = parseStlflixLink(raw);
+	if (stlflix) return { source: 'stlflix', target: stlflix };
+
+	const makerworld = parseMakerworldLink(raw);
+	if (makerworld) return { source: 'makerworld', target: makerworld };
+
+	return null;
 }
 
 /**
@@ -87,13 +90,19 @@ function localeOf(raw) {
 /**
  * Busca o link no resolvedor e devolve os itens já com as versões extraídas.
  * @param {string} raw
- * @param {{fetchImpl?: typeof fetch, signal?: AbortSignal}} [options]
+ * @param {{fetchImpl?: typeof fetch, signal?: AbortSignal, refresh?: boolean}} [options]
  * @returns {Promise<ReturnType<typeof hydrateImportResult>>}
  */
-export async function fetchImport(raw, { fetchImpl = globalThis.fetch, signal } = {}) {
-	const target = parseStlflixLink(raw);
-	if (!target) {
-		throw new ImportRequestError('invalid_url', 'Cole um link de modelo ou drop do STLFlix.');
+export async function fetchImport(
+	raw,
+	{ fetchImpl = globalThis.fetch, signal, refresh = false } = {},
+) {
+	const detected = detectImportSource(raw);
+	if (!detected) {
+		throw new ImportRequestError(
+			'invalid_url',
+			'Cole um link do STLFlix ou do MakerWorld.',
+		);
 	}
 
 	if (typeof fetchImpl !== 'function') {
@@ -105,12 +114,17 @@ export async function fetchImport(raw, { fetchImpl = globalThis.fetch, signal } 
 			? AbortSignal.timeout(15_000)
 			: undefined;
 
+	const refreshSuffix = refresh ? '&refresh=1' : '';
+
 	let response;
 	try {
-		response = await fetchImpl(`${IMPORT_ENDPOINT}?url=${encodeURIComponent(target.url)}`, {
-			headers: { accept: 'application/json' },
-			signal: signal ?? timeout,
-		});
+		response = await fetchImpl(
+			`${IMPORT_ENDPOINT}?url=${encodeURIComponent(detected.target.url)}${refreshSuffix}`,
+			{
+				headers: { accept: 'application/json' },
+				signal: signal ?? timeout,
+			},
+		);
 	} catch (error) {
 		if (error instanceof Error && error.name === 'AbortError') throw error;
 		if (error instanceof Error && error.name === 'TimeoutError') {
@@ -141,6 +155,14 @@ export async function fetchImport(raw, { fetchImpl = globalThis.fetch, signal } 
  * @param {any} payload
  */
 export function hydrateImportResult(payload) {
+	if (
+		payload &&
+		typeof payload === 'object' &&
+		(payload.source === 'makerworld' || Array.isArray(payload.profiles))
+	) {
+		return hydrateMakerworldPayload(payload);
+	}
+
 	if (!payload || typeof payload !== 'object' || !Array.isArray(payload.items)) {
 		throw new ImportRequestError(
 			'invalid_response',

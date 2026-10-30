@@ -12,7 +12,9 @@ const DEFAULT_PRICE = 100;
 const DEFAULT_WEIGHT = 1000;
 
 const listElement = () => document.getElementById('filamentList');
-const chipsElement = () => document.getElementById('colorChoices');
+
+/** A Calculadora e o Orçamento compartilham a mesma seleção de cores. */
+const chipElements = () => Array.from(document.querySelectorAll('[data-color-choices]'));
 
 /**
  * @param {'text'|'number'} type
@@ -79,31 +81,33 @@ export function renderList() {
 }
 
 export function renderChips() {
-	const container = chipsElement();
-	if (!container) return;
-
-	container.replaceChildren();
+	const containers = chipElements();
+	if (containers.length === 0) return;
 
 	const named = state.filaments
 		.map((filament, index) => ({ filament, index }))
 		.filter(({ filament }) => String(filament.name ?? '').trim() !== '');
 
-	if (named.length === 0) {
-		const empty = document.createElement('span');
-		empty.className = 'chips-empty';
-		empty.textContent = 'Cadastre um filamento para escolher a cor.';
-		container.append(empty);
-		return;
-	}
+	for (const container of containers) {
+		container.replaceChildren();
 
-	for (const { filament, index } of named) {
-		const chip = document.createElement('button');
-		chip.type = 'button';
-		chip.className = 'chip';
-		chip.textContent = filament.name;
-		chip.setAttribute('aria-pressed', String(state.selected.has(index)));
-		chip.addEventListener('click', () => toggleSelection(index));
-		container.append(chip);
+		if (named.length === 0) {
+			const empty = document.createElement('span');
+			empty.className = 'chips-empty';
+			empty.textContent = 'Cadastre um filamento para escolher a cor.';
+			container.append(empty);
+			continue;
+		}
+
+		for (const { filament, index } of named) {
+			const chip = document.createElement('button');
+			chip.type = 'button';
+			chip.className = 'chip';
+			chip.textContent = filament.name;
+			chip.setAttribute('aria-pressed', String(state.selected.has(index)));
+			chip.addEventListener('click', () => toggleSelection(index));
+			container.append(chip);
+		}
 	}
 }
 
