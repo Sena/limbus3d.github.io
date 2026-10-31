@@ -55,16 +55,32 @@ function persistHistory() {
 }
 
 export function renderHistory() {
-	const container = document.getElementById('historyList');
-	if (!container) return;
+	const shell = document.getElementById('historyList');
+	if (!shell) return;
 
-	container.replaceChildren();
+	updateStat();
+	shell.replaceChildren();
 
 	if (state.history.length === 0) {
-		const empty = document.createElement('p');
-		empty.className = 'chips-empty';
-		empty.textContent = 'Nenhum cálculo salvo ainda.';
-		container.append(empty);
+		const empty = document.createElement('div');
+		empty.className = 'history-empty';
+		const icon = document.createElement('svg');
+		icon.setAttribute('class', 'history-empty-icon');
+		icon.setAttribute('viewBox', '0 0 24 24');
+		icon.setAttribute('fill', 'none');
+		icon.setAttribute('stroke', 'currentColor');
+		icon.setAttribute('stroke-width', '1.8');
+		icon.setAttribute('stroke-linecap', 'round');
+		icon.setAttribute('aria-hidden', 'true');
+		icon.innerHTML = `<circle cx="12" cy="12" r="9"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path>`;
+		const title = document.createElement('p');
+		title.className = 'history-empty-title';
+		title.textContent = 'Nenhum cálculo salvo ainda.';
+		const note = document.createElement('p');
+		note.className = 'history-empty-note';
+		note.textContent = 'Use a calculadora ou o orçamento para salvar.';
+		empty.append(icon, title, note);
+		shell.append(empty);
 		return;
 	}
 
@@ -72,22 +88,51 @@ export function renderHistory() {
 		const item = document.createElement('article');
 		item.className = 'history-item';
 
+		const title = document.createElement('div');
+		title.className = 'history-item-title';
+		const tilt = document.createElement('span');
+		tilt.className = 'history-title';
+		tilt.textContent = sourceLabel(entry);
 		const price = document.createElement('span');
-		price.className = 'history-price';
+		price.className = 'history-item-price';
 		price.textContent = formatBRL(entry.total);
+		title.append(tilt, price);
 
-		const meta = document.createElement('span');
-		meta.className = 'history-meta';
+		const meta = document.createElement('p');
+		meta.className = 'history-item-meta';
 		meta.textContent = [
 			formatDateTime(entry.createdAt),
-			entry.itemsCount > 0 ? `${entry.itemsCount} itens` : `${entry.quantity} un`,
+			entry.itemsCount && entry.itemsCount > 0
+				? `${entry.itemsCount} itens`
+				: `${entry.quantity} un`,
 			formatWeight(entry.weightGrams),
 			formatDuration(entry.minutes),
 		].join(' · ');
 
-		item.append(price, meta);
-		container.append(item);
+		item.append(title, meta);
+		shell.append(item);
 	}
+}
+
+function sourceLabel(entry) {
+	if (entry.source) return `Orçamento · ${entry.source}`;
+	return 'Calculadora';
+}
+
+/** Linha do cabeçalho: quantos cálculos estão guardados e quanto somam. */
+function updateStat() {
+	const stat = document.getElementById('historyStat');
+	if (!stat) return;
+
+	const entries = state.history;
+
+	if (entries.length === 0) {
+		stat.textContent = 'Nada salvo ainda.';
+		return;
+	}
+
+	const total = entries.reduce((sum, entry) => sum + (Number(entry.total) || 0), 0);
+	stat.textContent = `${entries.length} ${entries.length === 1 ? 'cálculo' : 'cálculos'} · ${formatBRL(total)} no total`;
 }
 
 /** Guarda o orçamento de vários itens, com a quebra por prato. */
@@ -201,6 +246,11 @@ export function initHistory() {
 	document.getElementById('historyClose')?.addEventListener('click', closeHistory);
 	document.getElementById('historyClear')?.addEventListener('click', clearHistory);
 	document.getElementById('saveHistory')?.addEventListener('click', saveCurrent);
+	document.getElementById('historySaveCurrent')?.addEventListener('click', saveCurrent);
+
+	for (const button of document.querySelectorAll('[data-open-history]')) {
+		button.addEventListener('click', openHistory);
+	}
 
 	// Clique no fundo escurecido (que conta como clique no próprio diálogo).
 	dialog?.addEventListener('click', (event) => {

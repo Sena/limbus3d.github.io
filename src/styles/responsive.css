@@ -1,0 +1,369 @@
+/* responsive.css — a camada que muda com a largura, escrita mobile-first.
+ *
+ * O que está fora do @media é o telefone: é a base que todo mundo baixa e pinta
+ * primeiro, com o mínimo de regra. Só o que a tela larga ganha (gaveta lateral,
+ * colunas, cabeçalho de filamento) mora no @media (min-width: 40rem), para o
+ * desktop pagar o custo de layout e o telefone ficar pronto no primeiro paint. */
+
+/* ---------------------------------------------------------------- alvo de toque */
+
+/* 44px é o mínimo confortável para o dedo; abaixo disso o toque erra. */
+.tab,
+.chip,
+.btn,
+.input,
+.select {
+  min-height: 2.75rem;
+}
+
+.tab {
+  padding: var(--space-2) var(--space-3);
+}
+
+.btn-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+}
+
+.brand-sub {
+  font-size: 0.75rem;
+  letter-spacing: 0.11em;
+}
+
+/* Link no meio da frase: ganha área de toque sem virar botão. */
+#refineLink {
+  display: inline-block;
+  padding: 0.85rem 0;
+}
+
+/* -------------------------------------------------------------- folhas (dialog) */
+
+/* No telefone a folha é a tela: nada de gaveta de 26rem num visor de 390px. */
+dialog.sheet {
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  border-left: 0;
+}
+
+.sheet-inner {
+  gap: 0;
+  padding: 0;
+}
+
+/* Cada bloco cuida da sua margem lateral, porque a casca não tem padding. */
+dialog .sheet-head,
+dialog .sheet-inner > .history-list,
+dialog .sheet-inner > .import-items,
+dialog .sheet-inner > .plate-grid,
+dialog .sheet-inner > .sheet-note,
+dialog .sheet-footer {
+  padding-inline: var(--space-4);
+}
+
+dialog .pdf-summary {
+  margin-inline: var(--space-4);
+}
+
+dialog .sheet-head {
+  align-items: flex-start;
+}
+
+/* Três botões não cabem de lado: o principal ocupa a linha de cima. */
+dialog .sheet-footer {
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-bottom: max(var(--space-2), env(safe-area-inset-bottom));
+}
+
+dialog .sheet-footer .btn {
+  flex: 1 1 8rem;
+  white-space: nowrap;
+}
+
+dialog .sheet-footer .btn-primary {
+  flex-basis: 100%;
+  order: -1;
+}
+
+dialog .dialog-for {
+  padding: var(--space-4);
+}
+
+dialog #pdfDownload {
+  flex: 1;
+  justify-content: center;
+}
+
+dialog #pdfClose {
+  flex: 0 0 auto;
+  padding: var(--space-3) var(--space-4);
+}
+
+/* ------------------------------------------------------------------ histórico */
+
+/* A lista rola dentro da folha e o rodapé fica parado. */
+dialog .history-list {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+}
+
+.history-item {
+  padding: var(--space-3) var(--space-4);
+}
+
+.history-item-title {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.history-item-price {
+  font-size: var(--text-xl);
+  margin-top: var(--space-1);
+}
+
+.history-item-meta {
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+}
+
+.history-empty {
+  padding: var(--space-6) var(--space-4);
+}
+
+.history-empty-note {
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------------------ importação */
+
+.plate-grid {
+  grid-template-columns: 1fr;
+}
+
+.profile-option {
+  padding: var(--space-3);
+}
+
+.profile-option .profile-info {
+  gap: 2px;
+  min-width: 0;
+}
+
+.profile-option .profile-title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: var(--leading-normal);
+}
+
+.profile-option .profile-meta {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.profile-option .profile-thumb {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+/* ---------------------------------------------------------------- filamentos */
+
+/* Nome na primeira linha, preço e gramas na segunda: com quatro colunas o nome
+ * ficava com 68px e cortava "Cor padrão" para "Cor pa". */
+.filament-head {
+  display: none;
+}
+
+.filament-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name name remove'
+    'price grams remove';
+  row-gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--surface-2);
+}
+
+.filament-row > :nth-child(1) {
+  grid-area: name;
+}
+
+.filament-row > :nth-child(2) {
+  grid-area: price;
+}
+
+.filament-row > :nth-child(3) {
+  grid-area: grams;
+}
+
+.filament-row > :nth-child(4) {
+  grid-area: remove;
+  align-self: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-color: var(--border);
+}
+
+/* Dicas em lista: rótulo em cima, texto embaixo (a coluna de 5.5rem comia o texto). */
+.empty-list li {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-1);
+}
+
+.empty-list .term {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Link de compartilhamento: 12rem de caixa só empurra o resto para baixo. */
+textarea {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: unset;
+  height: 6rem;
+  max-height: 6rem;
+}
+
+/* ============================================================== tela larga ==== */
+
+/* Daqui para cima sobra espaço: a folha vira gaveta, os filamentos voltam a ser
+ * uma linha só e os pratos cabem dois por linha. Nada disso é baixado de regra
+ * pelo telefone — só chega a quem tem a largura. */
+
+@media (min-width: 40rem) {
+  .btn-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .brand-sub {
+    font-size: 0.6875rem;
+    letter-spacing: 0.13em;
+  }
+
+  #refineLink {
+    display: inline;
+    padding: 0;
+  }
+
+  /* A folha deixa de ocupar a tela e entra pela direita. */
+  dialog.sheet {
+    inset: 0 0 0 auto;
+    width: min(30rem, 100%);
+    max-height: none;
+    border-left: 1px solid var(--border);
+  }
+
+  .sheet-inner {
+    height: auto;
+  }
+
+  dialog .sheet-head,
+  dialog .sheet-inner > .history-list,
+  dialog .sheet-inner > .import-items,
+  dialog .sheet-inner > .plate-grid,
+  dialog .sheet-inner > .sheet-note,
+  dialog .sheet-footer {
+    padding-inline: var(--space-5);
+  }
+
+  dialog .pdf-summary {
+    margin-inline: var(--space-5);
+  }
+
+  dialog .sheet-head {
+    align-items: center;
+  }
+
+  dialog .sheet-footer {
+    flex-wrap: nowrap;
+    padding-bottom: var(--space-4);
+  }
+
+  dialog .sheet-footer .btn {
+    flex: 0 0 auto;
+  }
+
+  dialog .sheet-footer .btn-primary {
+    flex: 1;
+    order: 0;
+  }
+
+  .history-item {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .history-item-title {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .history-item-price {
+    font-size: var(--text-lg);
+    margin-top: 0;
+  }
+
+  .plate-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profile-option {
+    padding: var(--space-3);
+  }
+
+  .profile-option .profile-thumb {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .filament-head {
+    display: grid;
+  }
+
+  .filament-row {
+    grid-template-columns: minmax(0, 1fr) 5.5rem 6rem 2.25rem;
+    grid-template-areas: none;
+    row-gap: 0;
+    padding: var(--space-1);
+    background: transparent;
+  }
+
+  .filament-row > :nth-child(1),
+  .filament-row > :nth-child(2),
+  .filament-row > :nth-child(3),
+  .filament-row > :nth-child(4) {
+    grid-area: auto;
+  }
+
+  .filament-row > :nth-child(4) {
+    align-self: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-color: transparent;
+  }
+
+  .empty-list li {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  .empty-list .term {
+    font-size: inherit;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  textarea {
+    min-height: 4.5rem;
+    height: auto;
+    max-height: none;
+  }
+}

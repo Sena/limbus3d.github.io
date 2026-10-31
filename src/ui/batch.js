@@ -15,7 +15,7 @@ import { emit, on } from '../core/bus.js';
 import { openImportSheet } from './import-sheet.js';
 import { toast } from './notice.js';
 import { saveBatch } from './history.js';
-import { generateBatchPdf } from './export.js';
+import { openExportSheet } from './export.js';
 
 /** @type {ReturnType<typeof setTimeout> | null} */
 let clearTimer = null;
@@ -187,15 +187,18 @@ function renderItems() {
 
 function renderResult() {
 	const card = element('batchResult');
+	const placeholder = element('batchPlaceholder');
 	const result = state.batch.result;
 	if (!card) return;
 
 	if (!result) {
 		card.hidden = true;
+		if (placeholder) placeholder.hidden = false;
 		return;
 	}
 
 	card.hidden = false;
+	if (placeholder) placeholder.hidden = true;
 
 	const set = (id, value) => {
 		const node = element(id);
@@ -406,7 +409,7 @@ function exportPdf() {
 		toast('Monte um orçamento antes de gerar o PDF.');
 		return;
 	}
-	generateBatchPdf();
+	openExportSheet();
 }
 
 function onQuantityInput() {

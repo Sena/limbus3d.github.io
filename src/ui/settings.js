@@ -151,7 +151,7 @@ export function applyStoredSettings() {
  * @returns {{filaments: import('../core/pricing.js').Filament[]} & Record<string, string>}
  */
 export function getSnapshot() {
-	return { filaments: state.filaments, ...state.config };
+	return { filaments: state.filaments, ...state.config, _compact: true };
 }
 
 /**
