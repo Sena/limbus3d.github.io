@@ -98,11 +98,18 @@ async function init() {
 	presets.initPresets();
 	history.initHistory();
 
+	// Se o histórico abrir em tela cheia ou sobreposto, o painel atual continua
+	// visível; então invalide a visibilidade dos painéis assim que possível.
+	requestAnimationFrame(() => tabs.refreshPanelVisibility());
+
 	calculator.initCalculator();
 	importSheet.initImportSheet();
 	batch.initBatch();
 	share.initShare();
 	exports.initExport();
+
+	document.getElementById('historyExport')?.addEventListener('click', () => exports.openExportSheet());
+	document.getElementById('batchHistory')?.addEventListener('click', () => history.openHistory());
 
 	// A primeira visita às configurações desliga o convite para refinar.
 	on(EVENTS.TAB_CHANGED, ({ tab }) => {

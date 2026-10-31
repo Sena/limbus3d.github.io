@@ -30,7 +30,11 @@ export function encodeSettings(data) {
 export function decodeSettings(encoded) {
 	const binary = atob(encoded);
 	const text = new TextDecoder().decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)));
-	return JSON.parse(text.includes('\uFFFD') ? binary : text);
+	const data = JSON.parse(text.includes('\uFFFD') ? binary : text);
+	if (data && typeof data === 'object' && data._compact) {
+		return data;
+	}
+	return data;
 }
 
 /**

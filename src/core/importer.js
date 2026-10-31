@@ -24,11 +24,10 @@ const STLFLIX_PATH =
 const HEADING_PATTERN =
 	/(tempo de impress[ãa]o|printing time|tiempo de impresi[óo]n|consumo de filamento|filament consumption|altura aproximada|approximate height)/giu;
 
-const TIME_ENTRY_PATTERN =
-	/([\p{L}][\p{L}\s-]{0,30}?)\s*[-–—]\s*((?:\d+\s*(?:dias?|days?)\s*,?\s*)?\d+\s*(?:horas?|hours?|hrs?)(?:\s*\d+\s*(?:minutos?|minutes?|mins?))?|\d+\s*(?:minutos?|minutes?|mins?))/giu;
+/** Depois de `<strong>` virar espaço: `Monocolor - 08 Horas 44 Minutos`. */
+const LINE_LABEL_PATTERN = /^\s*([\p{L}][\p{L}\s]{0,30}?)\s*[-–—]\s*/u;
 
-const WEIGHT_ENTRY_PATTERN =
-	/([\p{L}][\p{L}\s-]{0,30}?)\s*[-–—]\s*([\d.,]+)\s*(?:gramas?|grams?|g)\b/giu;
+const GRAMS_PATTERN = /([\d.,]+)\s*(?:gramas?|grams?|g)\b/iu;
 
 /**
  * Diz de qual site é o link e devolve o alvo já validado.
@@ -263,18 +262,30 @@ export function parseStlflixDescription(html) {
 		return variants.get(key);
 	};
 
-	for (const match of sections.time.matchAll(TIME_ENTRY_PATTERN)) {
-		const minutes = durationToMinutes(match[2]);
-		if (!minutes) continue;
-		const variant = ensure(match[1]);
-		if (variant && variant.minutes === null) variant.minutes = minutes;
-	}
+	// Uma linha por versão: o STLFlix escreve tudo junto
+	// (`Multipart - 08 Horas 56 Minutos* - 144 g de filamento`), então peso e
+	// tempo da mesma versão precisam sair da mesma linha. Também há modelos em
+	// que a seção "Consumo de filamento" não existe e o peso vem só ali.
+	const lines = [...sectionLines(sections.time), ...sectionLines(sections.weight)];
 
-	for (const match of sections.weight.matchAll(WEIGHT_ENTRY_PATTERN)) {
-		const grams = parseGrams(match[2]);
-		if (!grams) continue;
+	for (const raw of lines) {
+		// O corte da seção deixa o `:` do cabeçalho na frente da linha.
+		const line = raw.replace(/^[^\p{L}]+/u, '');
+		const match = LINE_LABEL_PATTERN.exec(line);
+		if (!match) continue;
+
 		const variant = ensure(match[1]);
-		if (variant && variant.weightG === null) variant.weightG = grams;
+		if (!variant) continue;
+
+		if (variant.minutes === null) {
+			const minutes = durationToMinutes(line);
+			if (minutes) variant.minutes = minutes;
+		}
+
+		if (variant.weightG === null) {
+			const grams = firstGrams(line);
+			if (grams) variant.weightG = grams;
+		}
 	}
 
 	return [...variants.values()];
@@ -286,8 +297,8 @@ export function parseStlflixDescription(html) {
  */
 function stripHtml(html) {
 	return String(html ?? '')
-		.replace(/<br\s*\/?>/gi, ' ')
-		.replace(/<\/(p|li|ul|ol|h[1-6]|div|tr|td|th)>/gi, ' ')
+		.replace(/<br\s*\/?>/gi, '\n')
+		.replace(/<\/(p|li|ul|ol|h[1-6]|div|tr|td|th)>/gi, '\n')
 		.replace(/<[^>]*>/g, ' ')
 		.replace(/&nbsp;/gi, ' ')
 		.replace(/&ndash;/gi, '–')
@@ -298,8 +309,28 @@ function stripHtml(html) {
 		.replace(/&lt;/gi, '<')
 		.replace(/&gt;/gi, '>')
 		.replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
-		.replace(/\s+/g, ' ')
-		.trim();
+		.replace(/\u00a0/g, ' ')
+		.split('\n')
+		.map((line) => line.replace(/\s+/g, ' ').trim())
+		.filter(Boolean)
+		.join('\n');
+}
+
+/**
+ * @param {string} section
+ * @returns {string[]}
+ */
+function sectionLines(section) {
+	return section.split('\n').filter(Boolean);
+}
+
+/**
+ * @param {string} line
+ * @returns {number} gramas
+ */
+function firstGrams(line) {
+	const match = GRAMS_PATTERN.exec(line);
+	return match ? parseGrams(match[1]) : 0;
 }
 
 /**

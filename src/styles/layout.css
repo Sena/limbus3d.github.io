@@ -1,28 +1,31 @@
-/*
- * layout.css — casca do app: cabeçalho, abas, painéis e grades.
- */
+/* layout.css — casca do app: cabeçalho, abas, painéis e grades. */
 
 .app {
-	width: min(100%, 68rem);
+	width: min(100%, 76rem);
+	min-height: 100dvh;
 	margin: 0 auto;
-	padding: var(--space-6) var(--space-5) var(--space-8);
+	padding: clamp(1.25rem, 2.2vw, 2rem) var(--space-4) var(--space-7);
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-6);
-	min-height: 100dvh;
 }
 
 /* ------------------------------------------------------------------ cabeçalho */
 
 .app-header {
-	display: flex;
+	display: grid;
+	grid-template-columns: 1fr auto;
+	grid-template-areas:
+		'brand actions'
+		'tabs tabs';
 	align-items: center;
-	justify-content: space-between;
 	gap: var(--space-4);
-	flex-wrap: wrap;
+	padding-bottom: var(--space-4);
+	border-bottom: 1px solid var(--border);
 }
 
 .brand {
+	grid-area: brand;
 	display: flex;
 	flex-direction: column;
 	gap: 1px;
@@ -30,18 +33,27 @@
 
 .brand-name {
 	font-family: var(--font-display);
-	font-size: var(--text-2xl);
+	font-size: var(--text-xl);
 	font-weight: 600;
-	letter-spacing: -0.035em;
-	color: var(--brand);
+	letter-spacing: -0.045em;
+	color: var(--ink);
+	white-space: nowrap;
+}
+
+.brand-accent {
+	color: var(--accent);
 }
 
 .brand-sub {
-	font-size: var(--text-xs);
+	font-size: 0.6875rem;
+	text-transform: uppercase;
+	letter-spacing: 0.13em;
 	color: var(--muted);
 }
 
 .header-actions {
+	grid-area: actions;
+	justify-self: end;
 	display: flex;
 	align-items: center;
 	gap: var(--space-2);
@@ -50,40 +62,41 @@
 /* ------------------------------------------------------------------------ abas */
 
 .tabs {
+	grid-area: tabs;
+	justify-self: stretch;
 	display: flex;
-	gap: var(--space-1);
-	padding: var(--space-1);
+	gap: 2px;
+	padding: 3px;
 	background: var(--surface-3);
-	border: 1px solid var(--border);
-	border-radius: var(--radius);
+	border-radius: var(--radius-pill);
 }
 
 .tab {
-	flex: 1;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: var(--space-2);
-	padding: var(--space-3) var(--space-5);
-	border: 1px solid transparent;
-	border-radius: var(--radius-xs);
+	flex: 1;
+	padding: var(--space-2);
+	border: 0;
+	border-radius: var(--radius-pill);
 	background: transparent;
-	color: var(--ink-2);
-	font-size: var(--text-sm);
+	color: var(--muted);
+	font-size: var(--text-xs);
 	font-weight: 500;
+	white-space: nowrap;
 	transition: background var(--dur-2) var(--ease-standard),
-		color var(--dur-2) var(--ease-standard),
-		border-color var(--dur-2) var(--ease-standard);
+		color var(--dur-2) var(--ease-standard);
 }
 
 .tab:hover {
 	color: var(--ink);
+	background: var(--surface-2);
 }
 
 .tab[aria-selected='true'] {
 	background: var(--surface-1);
-	border-color: var(--border);
-	color: var(--ink);
+	color: var(--brand);
 	font-weight: 600;
 	box-shadow: var(--shadow-soft);
 }
@@ -117,20 +130,46 @@ html[data-tab='settings'] #panel-batch {
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-5);
+	animation: panel-in var(--dur-3) var(--ease-out-back);
+}
+
+@keyframes panel-in {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
 }
 
 .calc-layout {
 	display: grid;
-	grid-template-columns: 1fr;
+	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-5);
 	align-items: start;
 }
 
+/* Configurações: duas colunas de verdade, cada uma empilhando os seus cartões.
+ * Com grid de linhas iguais sobrava buraco embaixo do cartão mais curto. */
 .settings-grid {
 	display: grid;
-	grid-template-columns: 1fr;
+	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-4);
 	align-items: start;
+}
+
+.settings-grid > .col {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+	min-width: 0;
+}
+
+.settings-grid > .col + .col {
+	border-left: 0;
+	padding-left: 0;
 }
 
 .fields {
@@ -141,13 +180,13 @@ html[data-tab='settings'] #panel-batch {
 
 .fields-2 {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-4);
 }
 
 .fields-3 {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-columns: minmax(0, 1fr);
 	gap: var(--space-4);
 }
 
@@ -172,76 +211,139 @@ html[data-tab='settings'] #panel-batch {
 
 /* ---------------------------------------------------------------------- rodapé */
 
-.app-footer {
-	display: flex;
-	justify-content: space-between;
-	gap: var(--space-4);
-	flex-wrap: wrap;
-	margin-top: auto;
-	padding-top: var(--space-2);
-	border-top: 1px solid var(--border);
-	font-size: var(--text-xs);
-	color: var(--muted);
-}
 
 /* ------------------------------------------------------------- telas maiores */
 
-@media (min-width: 52rem) {
+
+@media (min-width: 30rem) {
 	.app {
-		padding: var(--space-8) var(--space-6) var(--space-9);
-		gap: var(--space-7);
+		padding-inline: clamp(1rem, 3vw, 2.25rem);
 	}
 
-	.calc-layout {
-		grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+	.fields-2 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.fields-3 {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.tab {
+		padding: var(--space-2) var(--space-4);
+		font-size: var(--text-sm);
+	}
+}
+
+@media (min-width: 40rem) {
+	.app-header {
+		grid-template-columns: auto 1fr auto;
+		grid-template-areas: 'brand tabs actions';
 		gap: var(--space-6);
 	}
 
-	.calc-layout > :last-child {
-		position: sticky;
-		top: var(--space-6);
+	.tabs {
+		justify-self: start;
+	}
+
+	.tab {
+		flex: 0 1 auto;
+	}
+
+	.settings-grid > .col + .col {
+		border-left: 1px solid var(--border);
+		padding-left: var(--space-4);
+	}
+}
+
+@media (min-width: 48rem) {
+	.app {
+		padding-top: var(--space-7);
+		gap: var(--space-7);
+	}
+
+	.app-header {
+		grid-template-columns: auto auto 1fr;
+		grid-template-areas: 'brand tabs actions';
+		gap: var(--space-7);
 	}
 
 	.settings-grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	.settings-grid > .card-span {
-		grid-column: 1 / -1;
-	}
-
-	.card {
-		padding: var(--space-6);
-	}
-
-	.tabs {
-		align-self: flex-start;
-		min-width: 24rem;
-	}
-}
-
-@media (max-width: 30rem) {
-	.app {
-		padding: var(--space-5) var(--space-4) var(--space-7);
 		gap: var(--space-5);
 	}
 
-	.fields-3,
-	.fields-2 {
-		grid-template-columns: 1fr;
+	.settings-grid > .col + .col {
+		border-left: 0;
+		padding-left: 0;
 	}
 
-	.header-actions {
-		width: 100%;
-		justify-content: space-between;
+	#panel-settings .settings-grid > .card-wide {
+		grid-column: 1 / -1;
 	}
 
-	.tabs {
-		gap: 2px;
+	/* O trabalho fica no centro óptico da tela, não encostado no cabeçalho com um
+	 * vazio embaixo. `safe center` evita cortar o topo quando a aba é mais alta. */
+	main {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		justify-content: safe center;
 	}
 
-	.tab {
-		padding: var(--space-3) var(--space-2);
-		font-size: var(--text-xs);
+	.panel {
+		flex: 0 0 auto;
+	}
+
+	/* Peça e preço lado a lado; cada cartão com a altura do seu conteúdo. */
+	.calc-layout {
+		grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+		grid-auto-rows: min-content;
+		gap: var(--space-6);
+		align-items: start;
+	}
+
+	/* O convite do estado vazio centraliza na moldura tracejada. */
+	.calc-layout > #calcEmpty {
+		display: flex;
+		align-items: center;
+	}
+
+	/* Orçamento: o preço fica na coluna da direita, no topo, e os cartões de
+	 * trabalho empilham na esquerda. Antes o resultado caía na segunda linha,
+	 * deixando um vão em branco embaixo do cartão de importação. */
+	#panel-batch .calc-layout {
+		grid-template-areas:
+			'model result'
+			'items items';
+	}
+
+	#panel-batch .calc-layout > .card:nth-child(1) {
+		grid-area: model;
+		/* Estica junto com o painel de preço: os dois cartões fecham na mesma
+		 * linha, em vez de deixar um degrau de 100px embaixo do modelo. */
+		align-self: stretch;
+	}
+
+	#panel-batch .calc-layout > .card:nth-child(2) {
+		grid-area: items;
+	}
+
+	#panel-batch .calc-layout > #batchResult,
+	#panel-batch .calc-layout > #batchPlaceholder {
+		grid-area: result;
+	}
+
+	#panel-settings .settings-grid > .card-wide {
+		grid-column: 1 / -1;
+	}
+
+	/* Ainda sem orçamento ou cálculo, o resultado vazio não puxa a coluna do preço 
+	 * para o centro da tela; o painel de preço entra no fluxo normal e fica à direita. */
+	#panel-calc .calc-layout > :nth-child(2),
+	#panel-calc .calc-layout > :nth-child(3),
+	#panel-batch .calc-layout > :nth-child(3),
+	#panel-batch .calc-layout > :nth-child(4) {
+		position: relative;
+		top: auto;
 	}
 }

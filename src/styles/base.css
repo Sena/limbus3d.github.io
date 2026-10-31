@@ -36,8 +36,10 @@ body {
 	line-height: var(--leading-normal);
 	color: var(--ink);
 	background:
-		radial-gradient(ellipse 90rem 42rem at 12% -12%, var(--bg-glow), transparent 60%),
+		radial-gradient(ellipse 70rem 38rem at 6% -10%, var(--bg-glow), transparent 62%),
+		radial-gradient(ellipse 55rem 32rem at 98% 2%, var(--bg-glow-2), transparent 58%),
 		var(--bg);
+	background-attachment: fixed;
 	caret-color: var(--brand);
 	min-height: 100dvh;
 	-webkit-font-smoothing: antialiased;

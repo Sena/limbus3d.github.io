@@ -44,18 +44,30 @@
 	<link rel="stylesheet" href="src/styles/base.css">
 	<link rel="stylesheet" href="src/styles/layout.css">
 	<link rel="stylesheet" href="src/styles/components.css">
-
-	<script defer src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-	<script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+	<link rel="stylesheet" href="src/styles/sheets.css">
+	<link rel="stylesheet" href="src/styles/responsive.css">
 	<script type="module" src="src/main.js"></script>
 </head>
 <body>
 	<div class="app">
 		<header class="app-header">
 			<div class="brand">
-				<span class="brand-name">Limbus 3D</span>
-				<span class="brand-sub">Calculadora de impressão 3D</span>
+				<span class="brand-name">Limbus <span class="brand-accent">3D</span></span>
+				<span class="brand-sub">Calculadora de impressão</span>
 			</div>
+
+			<nav class="tabs" role="tablist" aria-label="Seções da calculadora">
+				<button type="button" class="tab" role="tab" id="tab-calc" aria-controls="panel-calc" aria-selected="true" data-tab="calc">
+					Calculadora
+				</button>
+				<button type="button" class="tab" role="tab" id="tab-batch" aria-controls="panel-batch" aria-selected="false" tabindex="-1" data-tab="orcamento">
+					Orçamento
+				</button>
+				<button type="button" class="tab" role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" tabindex="-1" data-tab="settings">
+					Configurações
+					<span class="tab-dot" id="settingsDot" aria-hidden="true" hidden></span>
+				</button>
+			</nav>
 
 			<div class="header-actions">
 				<button type="button" class="btn btn-icon" id="themeToggle" aria-label="Alternar entre tema claro e escuro" title="Alternar tema">
@@ -76,19 +88,6 @@
 				</button>
 			</div>
 		</header>
-
-		<nav class="tabs" role="tablist" aria-label="Seções da calculadora">
-			<button type="button" class="tab" role="tab" id="tab-calc" aria-controls="panel-calc" aria-selected="true" data-tab="calc">
-				Calculadora
-			</button>
-			<button type="button" class="tab" role="tab" id="tab-batch" aria-controls="panel-batch" aria-selected="false" tabindex="-1" data-tab="orcamento">
-				Orçamento
-			</button>
-			<button type="button" class="tab" role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" tabindex="-1" data-tab="settings">
-				Configurações
-				<span class="tab-dot" id="settingsDot" aria-hidden="true" hidden></span>
-			</button>
-		</nav>
 
 		<main>
 			<!-- ------------------------------------------------------------ calculadora -->
@@ -221,11 +220,6 @@
 					</div>
 
 					<div class="result" id="batchResult" hidden>
-						<div>
-							<p class="result-label">Preço total estimado</p>
-							<p class="result-value" id="batchTotal">R$ 0,00</p>
-						</div>
-
 						<div class="batch-summary">
 							<div class="batch-summary-row"><span>Peso total</span><span id="batchWeight">—</span></div>
 							<div class="batch-summary-row"><span>Tempo total</span><span id="batchTime">—</span></div>
@@ -236,12 +230,29 @@
 							</div>
 						</div>
 
-						<div class="result-actions">
-							<button type="button" class="btn" id="batchSaveHistory">Salvar no histórico</button>
-							<button type="button" class="btn" id="batchExportPdf">Gerar PDF</button>
+						<div class="result-total">
+							<p class="result-label">Preço total do lote</p>
+							<p class="result-value" id="batchTotal">R$ 0,00</p>
 						</div>
 
-						<p class="card-note">Setup cobrado uma vez por impressão.</p>
+						<div class="result-actions">
+							<button type="button" class="btn" id="batchSaveHistory">Salvar no histórico</button>
+							<button type="button" class="btn" id="batchHistory">Histórico</button>
+							<button type="button" class="btn" id="batchExport">Exportar PDF</button>
+						</div>
+
+						
+					</div>
+
+					<div class="card" id="batchPlaceholder">
+						<div class="empty">
+							<span class="empty-title">Orçamento vazio</span>
+							<p>O preço do lote aparece aqui assim que os pratos entrarem na lista.</p>
+							<ul class="empty-list">
+								<li><span class="term">Link</span><span>Modelo do MakerWorld ou modelo/drop do STLFlix.</span></li>
+								<li><span class="term">Pratos</span><span>Escolha um perfil e marque os pratos que entram.</span></li>
+							</ul>
+						</div>
 					</div>
 				</div>
 			</section>
@@ -249,6 +260,7 @@
 			<!-- ----------------------------------------------------------- configurações -->
 			<section class="panel" id="panel-settings" role="tabpanel" aria-labelledby="tab-settings">
 				<div class="settings-grid">
+					<div class="col">
 					<div class="card">
 						<div class="card-head">
 							<h2 class="card-title">Energia</h2>
@@ -307,7 +319,6 @@
 								<div class="field">
 									<label class="field-label" for="machineCost">Setup por lote (R$)</label>
 									<input class="input" type="number" id="machineCost" value="8" step="0.5" min="0">
-									<span class="field-hint">Cobrado uma vez por impressão, não por peça.</span>
 								</div>
 
 								<div class="field">
@@ -325,6 +336,9 @@
 						</div>
 					</div>
 
+					</div>
+
+					<div class="col">
 					<div class="card">
 						<div class="card-head">
 							<h2 class="card-title">Perdas e acabamento</h2>
@@ -371,35 +385,29 @@
 									<input class="input" type="number" id="cardFeeRate" value="0" step="0.1" min="0" max="20">
 									<span class="field-hint">Maquininha ou gateway.</span>
 								</div>
-							</div>
-
-							<p class="note">
-								<strong>Os dois saem do preço, não entram em cima dele.</strong> O valor final é dividido
-								por (1 − taxa), então a taxa é paga pelo preço cobrado sem reduzir o seu markup. Com
-								10% no total, um preço de R$ 100,00 vira R$ 111,11.
+							</div>						<p class="note">
+							<strong>Os dois saem do preço, não entram em cima dele.</strong> O valor final é dividido
+							por (1 − taxa), então a taxa é paga pelo preço cobrado sem reduzir o seu markup. Com
+							10% no total, um preço de R$ 100,00 vira R$ 111,11.
 							</p>
 						</div>
 					</div>
 
-					<div class="card card-span">
+					<div class="card">
 						<div class="card-head">
-							<h2 class="card-title">Meus filamentos</h2>
-							<span class="card-note">Preço do rolo e peso do rolo</span>
+							<h2 class="card-title">Histórico</h2>
+							<span class="card-note">Últimos cálculos salvos</span>
 						</div>
 
-						<div class="filament-head" aria-hidden="true">
-							<span>Nome</span>
-							<span>R$</span>
-							<span>gramas</span>
-							<span></span>
+						<div class="fields">
+							<div class="row-tight">
+								<button type="button" class="btn btn-primary" data-open-history>Abrir histórico</button>
+								<button type="button" class="btn" data-open-export>Gerar PDF</button>
+							</div>
+							<span class="field-hint">O histórico fica apenas no navegador.
+								O PDF serve para guardar ou enviar o cálculo por escrito.</span>
+							</div>
 						</div>
-
-						<div class="stack" id="filamentList"></div>
-
-						<button type="button" class="btn btn-block" id="addFilament" style="margin-top: var(--space-3)">
-							Adicionar filamento
-						</button>
-					</div>
 
 					<div class="card">
 						<div class="card-head">
@@ -446,19 +454,42 @@
 							</span>
 						</div>
 					</div>
+					</div>
+
+					<div class="card card-span">
+						<div class="card-head">
+							<h2 class="card-title">Meus filamentos</h2>
+							<span class="card-note">Preço do rolo e peso do rolo</span>
+						</div>
+
+						<div class="filament-head" aria-hidden="true">
+							<span>Nome</span>
+							<span>R$</span>
+							<span>gramas</span>
+							<span></span>
+						</div>
+
+						<div class="stack" id="filamentList"></div>
+
+						<button type="button" class="btn btn-block" id="addFilament">
+							Adicionar filamento
+						</button>
+					</div>
 				</div>
 			</section>
 		</main>
-
-		<footer class="app-footer">
-			<span>Os valores são estimativas. Confira a tarifa na sua fatura de energia.</span>
-		</footer>
+		<button type="button" id="mobileCopyLink" hidden>Copiar link</button>
+		<button type="button" id="mobileQrButton" hidden>Gerar QR Code</button>
 	</div>
 
 	<dialog class="sheet" id="historySheet" aria-labelledby="historyTitle">
 		<div class="sheet-inner">
 			<div class="sheet-head">
-				<h2 class="card-title" id="historyTitle">Histórico de cálculos</h2>
+				<div class="sheet-heading">
+					<h2 class="card-title" id="historyTitle">Histórico de cálculos</h2>
+					<p class="field-hint" id="historyNote">Esses cálculos ficam apenas no navegador.</p>
+					<p class="sheet-stat" id="historyStat"></p>
+				</div>
 				<button type="button" class="btn btn-icon" id="historyClose" aria-label="Fechar histórico">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
 						<path d="M6 6l12 12M18 6L6 18"></path>
@@ -468,7 +499,11 @@
 
 			<div class="history-list" id="historyList"></div>
 
-			<button type="button" class="btn btn-danger btn-block" id="historyClear">Limpar histórico</button>
+			<div class="sheet-footer">
+				<button type="button" class="btn btn-danger" id="historyClear">Limpar histórico</button>
+				<button type="button" class="btn btn-primary" id="historySaveCurrent">Salvar este cálculo</button>
+				<button type="button" class="btn" id="historyExport">Exportar histórico</button>
+			</div>
 		</div>
 	</dialog>
 
@@ -499,6 +534,60 @@
 		</div>
 	</dialog>
 
+	<dialog class="sheet" id="pdfSheet" aria-labelledby="pdfTitle">
+		<div class="sheet-inner">
+			<div class="sheet-head">
+				<div class="sheet-heading">
+					<h2 class="card-title" id="pdfTitle">Exportar este orçamento</h2>
+					<p class="field-hint" id="pdfNote">Um PDF com o resumo fica pronto para download.</p>
+				</div>
+				<button type="button" class="btn btn-icon" id="pdfClose" aria-label="Fechar exportação">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+						<path d="M6 6l12 12M18 6L6 18"></path>
+					</svg>
+				</button>
+			</div>
+
+			<div class="pdf-summary">
+				<div class="pdf-row">
+					<span class="pdf-term">Origem</span>
+					<span class="pdf-value" id="pdfOrigin">—</span>
+				</div>
+				<div class="pdf-row">
+					<span class="pdf-term">Cores</span>
+					<span class="pdf-value" id="pdfColors">—</span>
+				</div>
+				<div class="pdf-row">
+					<span class="pdf-term">Itens</span>
+					<span class="pdf-value" id="pdfItems">—</span>
+				</div>
+				<div class="pdf-row">
+					<span class="pdf-term">Peso total</span>
+					<span class="pdf-value" id="pdfWeight">—</span>
+				</div>
+				<div class="pdf-row">
+					<span class="pdf-term">Tempo total</span>
+					<span class="pdf-value" id="pdfTime">—</span>
+				</div>
+				<div class="pdf-total">
+					<span class="pdf-term">Total</span>
+					<span class="pdf-value" id="pdfTotal">R$ 0,00</span>
+				</div>
+			</div>
+
+			<p class="sheet-note">
+				O arquivo leva a lista de pratos, o peso e o tempo totais, o desconto de lote e o preço
+				final. É o mesmo que está na tela, pronto para guardar ou mandar para o cliente.
+			</p>
+
+			<div class="sheet-footer">
+				<button type="button" class="btn" id="pdfCancel">Voltar</button>
+				<button type="button" class="btn btn-primary" id="pdfDownload" disabled>Baixar PDF</button>
+			</div>
+		</div>
+	</dialog>
+
 	<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
 </body>
 </html>

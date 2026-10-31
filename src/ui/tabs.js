@@ -71,3 +71,8 @@ export function initTabs() {
 
 	switchTab(storage.read(STORAGE_KEYS.tab, TABS.CALC));
 }
+
+export function refreshPanelVisibility() {
+	const current = storage.read(STORAGE_KEYS.tab, TABS.CALC);
+	if (current) switchTab(current);
+}
